@@ -5,7 +5,7 @@ import Image from "react-bootstrap/Image";
 function HomeCategory({ categoryName, imgSrc }) {
   return (
     <Col xs={6} md={4} lg={2}>
-      <Image fluid rounded src={imgSrc} alt="Img of category" />
+      <Image fluid rounded src={imgSrc} alt={categoryName} />
       <h5>{categoryName}</h5>
     </Col>
   );

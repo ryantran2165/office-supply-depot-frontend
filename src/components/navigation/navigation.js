@@ -9,7 +9,8 @@ import Dropdown from "react-bootstrap/Dropdown";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import { FaSearch } from "react-icons/fa";
 import Home from "../home/home";
-import Login from "../login/login";
+import SignIn from "../account/sign-in";
+import SignUp from "../account/sign-up";
 import Cart from "../cart/cart";
 
 function Navigation() {
@@ -39,8 +40,8 @@ function Navigation() {
           </Nav>
           <Nav>
             <Nav.Item>
-              <Link to="/login" className="nav-link">
-                Login
+              <Link to="/sign-in" className="nav-link">
+                Account
               </Link>
             </Nav.Item>
             <Nav.Item>
@@ -52,8 +53,11 @@ function Navigation() {
         </Navbar.Collapse>
       </Navbar>
       <Switch>
-        <Route path="/login">
-          <Login />
+        <Route path="/sign-in">
+          <SignIn />
+        </Route>
+        <Route path="/sign-up">
+          <SignUp />
         </Route>
         <Route path="/cart">
           <Cart />

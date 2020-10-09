@@ -46,3 +46,31 @@ body {
     box-shadow: none;
   }
 }
+
+.account-form {
+  border: 1px solid gray;
+  padding: 15px 30px 30px 30px;
+}
+
+.account-logo {
+  width: 100px;
+  height: 100px;
+}
+
+.button-oval {
+  border-radius: 30px 30px 30px 30px !important;
+}
+
+.account-button-container {
+  padding-left: 30px;
+  padding-right: 30px;
+}
+
+.button-orange {
+  background-color: orange !important;
+  border-color: orange !important;
+
+  &:focus {
+    box-shadow: 0 0 0 0.2rem rgba(255, 165, 0, 0.5) !important;
+  }
+}
