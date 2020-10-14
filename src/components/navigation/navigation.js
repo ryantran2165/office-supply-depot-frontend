@@ -12,8 +12,32 @@ import Home from "../home/home";
 import SignIn from "../account/sign-in";
 import SignUp from "../account/sign-up";
 import Cart from "../cart/cart";
+import Account from "../account/account";
 
-function Navigation() {
+function Navigation({
+  signedIn,
+  user,
+  handleSignIn,
+  handleSignUp,
+  handleSignOut,
+}) {
+  let accountLink;
+
+  // Test for undefined because it loads twice and the first load has undefined user
+  if (signedIn && user !== undefined) {
+    accountLink = (
+      <Link to="/account" className="nav-link">
+        Hi {user.first_name}
+      </Link>
+    );
+  } else {
+    accountLink = (
+      <Link to="/sign-in" className="nav-link">
+        Account
+      </Link>
+    );
+  }
+
   return (
     <Router>
       <Navbar bg="light" expand="lg" className="justify-content-center pt-3">
@@ -39,28 +63,34 @@ function Navigation() {
             </Dropdown>
           </Nav>
           <Nav>
-            <Nav.Item>
-              <Link to="/sign-in" className="nav-link">
-                Account
-              </Link>
-            </Nav.Item>
+            <Nav.Item>{accountLink}</Nav.Item>
             <Nav.Item>
               <Link to="/cart" className="nav-link">
                 Cart
               </Link>
             </Nav.Item>
+            {signedIn && (
+              <Nav.Item>
+                <Link to="/" className="nav-link" onClick={handleSignOut}>
+                  Sign out
+                </Link>
+              </Nav.Item>
+            )}
           </Nav>
         </Navbar.Collapse>
       </Navbar>
       <Switch>
         <Route path="/sign-in">
-          <SignIn />
+          <SignIn signedIn={signedIn} handleSignIn={handleSignIn} />
         </Route>
         <Route path="/sign-up">
-          <SignUp />
+          <SignUp signedIn={signedIn} handleSignUp={handleSignUp} />
         </Route>
         <Route path="/cart">
           <Cart />
+        </Route>
+        <Route path="/account">
+          <Account />
         </Route>
         <Route path="/">
           <Home />

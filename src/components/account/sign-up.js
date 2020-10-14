@@ -1,13 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Image from "react-bootstrap/Image";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
-function SignUp() {
+function SignUp({ signedIn, handleSignUp }) {
+  const [first_name, setFirstName] = useState("");
+  const [last_name, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const history = useHistory();
+
+  // Already signed in, redirect to home
+  if (signedIn) {
+    history.push("/");
+  }
+
   return (
     <Container className="pt-5 pb-5">
       <Row className="justify-content-center">
@@ -21,23 +32,52 @@ function SignUp() {
               />
             </Col>
           </Row>
-          <Form className="account-form">
+          <Form
+            className="account-form"
+            onSubmit={(e) =>
+              handleSignUp(e, { first_name, last_name, email, password })
+            }
+          >
             <h3 className="text-center mb-3">Create your account</h3>
             <Form.Group controlId="formFirstName">
               <Form.Label>First name</Form.Label>
-              <Form.Control type="text" placeholder="Enter first name" />
+              <Form.Control
+                required
+                type="text"
+                placeholder="John"
+                value={first_name}
+                onChange={(e) => setFirstName(e.target.value)}
+              />
             </Form.Group>
             <Form.Group controlId="formLastName">
               <Form.Label>Last name</Form.Label>
-              <Form.Control type="text" placeholder="Enter last name" />
+              <Form.Control
+                required
+                type="text"
+                placeholder="Doe"
+                value={last_name}
+                onChange={(e) => setLastName(e.target.value)}
+              />
             </Form.Group>
             <Form.Group controlId="formBasicEmail">
               <Form.Label>Email address</Form.Label>
-              <Form.Control type="email" placeholder="Enter email" />
+              <Form.Control
+                required
+                type="email"
+                placeholder="john.doe@gmail.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </Form.Group>
             <Form.Group controlId="formBasicPassword">
               <Form.Label>Password</Form.Label>
-              <Form.Control type="password" placeholder="Enter password" />
+              <Form.Control
+                required
+                type="password"
+                placeholder="**********"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </Form.Group>
             <Form.Group controlId="formBasicCheckbox">
               <Form.Check type="checkbox" label="Remember me" />
