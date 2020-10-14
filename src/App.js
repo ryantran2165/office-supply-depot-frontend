@@ -31,7 +31,7 @@ function App() {
           setSignedIn(false);
         });
     }
-  }, []);
+  }, [signedIn]);
 
   function handleSignIn(e, data) {
     // Prevent default form behavior
