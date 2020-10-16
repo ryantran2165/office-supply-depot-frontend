@@ -15,6 +15,7 @@ body {
   border-left: 1px solid gray;
   background-color: white;
   color: black;
+  flex: 1;
 
   &:focus {
     box-shadow: none;
@@ -25,8 +26,9 @@ body {
   border-radius: 0;
   border-top: 1px solid gray;
   border-bottom: 1px solid gray;
-  border-left: 0;
+  border-left: 1px solid gray;
   border-right: 0;
+  flex: 10;
 
   &:focus {
     box-shadow: none;
@@ -41,6 +43,7 @@ body {
   border-left: 0;
   background-color: orange;
   color: black;
+  flex: 1;
 
   &:focus {
     box-shadow: none;
