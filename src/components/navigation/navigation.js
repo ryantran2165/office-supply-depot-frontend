@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { signOut } from "../../actions/auth-actions";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { BrowserRouter, Switch, Route, Link } from "react-router-dom";
 import RestrictedRoute from "../restricted-route";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
@@ -21,7 +21,7 @@ import Cart from "../cart/cart";
 class Navigation extends Component {
   render() {
     return (
-      <Router>
+      <BrowserRouter>
         <Navbar bg="light" expand="md" className="justify-content-center pt-3">
           <Link to="/" className="navbar-brand">
             Office Supply Depot
@@ -117,7 +117,7 @@ class Navigation extends Component {
             <Home />
           </Route>
         </Switch>
-      </Router>
+      </BrowserRouter>
     );
   }
 }
