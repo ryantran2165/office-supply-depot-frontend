@@ -1,20 +1,25 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Route, Redirect } from "react-router-dom";
-import { useSelector } from "react-redux";
 
 export default function RestrictedRoute({
   path,
   component: Component,
   allowSignedIn,
   redirect,
+  signedIn,
+  navigation: Navigation,
 }) {
-  // Get signedIn state from store
-  const signedIn = useSelector((state) => state.auth.signedIn);
-
   return (
     <Route path={path}>
-      {allowSignedIn === signedIn ? <Component /> : <Redirect to={redirect} />}
+      {allowSignedIn === signedIn ? (
+        <React.Fragment>
+          {Navigation ? <Navigation /> : ""}
+          <Component />
+        </React.Fragment>
+      ) : (
+        <Redirect to={redirect} />
+      )}
     </Route>
   );
 }
@@ -24,4 +29,6 @@ RestrictedRoute.propTypes = {
   component: PropTypes.elementType,
   allowSignedIn: PropTypes.bool,
   redirect: PropTypes.string,
+  signedIn: PropTypes.bool,
+  navigation: PropTypes.elementType,
 };
