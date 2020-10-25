@@ -3,7 +3,11 @@ import PropTypes from "prop-types";
 import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { signOut } from "../../actions/auth-actions";
-import { setQuery } from "../../actions/products-actions";
+import {
+  setQuery,
+  setCategory,
+  setSubcategory,
+} from "../../actions/products-actions";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import Form from "react-bootstrap/Form";
@@ -12,7 +16,7 @@ import Button from "react-bootstrap/Button";
 import Dropdown from "react-bootstrap/Dropdown";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import { FaSearch } from "react-icons/fa";
-import DropdownButton from "react-bootstrap/DropdownButton";
+import productCategories from "../product-categories";
 
 class Navigation extends Component {
   constructor(props) {
@@ -28,9 +32,45 @@ class Navigation extends Component {
 
   handleOnSubmit = (e) => {
     e.preventDefault();
+
+    // Query always resets category and subcategory
     this.props.setQuery(this.state.query);
     this.props.history.push("/products");
   };
+
+  handleNavOnClick = (category, subcategory) => {
+    // Nav clicks reset query, but inside products page filters don't reset query
+    this.setState({ query: "" });
+    this.props.setQuery("");
+    this.props.setCategory(category);
+    this.props.setSubcategory(subcategory);
+    this.props.history.push("/products");
+  };
+
+  getNavDropdowns() {
+    return productCategories.map((productCategory) => {
+      const category = productCategory[0];
+      const subcategories = productCategory[1];
+
+      return (
+        <NavDropdown
+          title={category}
+          className="submenu"
+          drop="right"
+          key={category}
+        >
+          {subcategories.map((subcategory) => (
+            <NavDropdown.Item
+              onClick={() => this.handleNavOnClick(category, subcategory)}
+              key={subcategory}
+            >
+              {subcategory}
+            </NavDropdown.Item>
+          ))}
+        </NavDropdown>
+      );
+    });
+  }
 
   render() {
     return (
@@ -50,20 +90,7 @@ class Navigation extends Component {
               {/*Dropdown for non-mobile only*/}
               <Dropdown className="d-none d-md-block">
                 <Dropdown.Toggle id="search-dropdown" />
-                <Dropdown.Menu>
-                  <Dropdown.Item>Office Supplies</Dropdown.Item>
-                  <Dropdown.Item>Furniture</Dropdown.Item>
-                  <Dropdown.Item>Cleaning</Dropdown.Item>
-                  <DropdownButton
-                    title="Submenu"
-                    drop="right"
-                    className="submenu-button"
-                  >
-                    <Dropdown.Item>Submenu item 1</Dropdown.Item>
-                    <Dropdown.Item>Submenu item 2</Dropdown.Item>
-                    <Dropdown.Item>Submenu item 3</Dropdown.Item>
-                  </DropdownButton>
-                </Dropdown.Menu>
+                <Dropdown.Menu>{this.getNavDropdowns()}</Dropdown.Menu>
               </Dropdown>
               <FormControl
                 type="text"
@@ -79,9 +106,7 @@ class Navigation extends Component {
             </Form>
             {/*Dropdown for mobile only*/}
             <NavDropdown title="Products" className="d-md-none">
-              <NavDropdown.Item>Office Supplies</NavDropdown.Item>
-              <NavDropdown.Item>Furniture</NavDropdown.Item>
-              <NavDropdown.Item>Cleaning</NavDropdown.Item>
+              {this.getNavDropdowns()}
             </NavDropdown>
           </Nav>
           <Nav>
@@ -122,6 +147,8 @@ Navigation.propTypes = {
   user: PropTypes.object,
   signOut: PropTypes.func,
   setQuery: PropTypes.func,
+  setCategory: PropTypes.func,
+  setSubcategory: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -129,6 +156,9 @@ const mapStateToProps = (state) => ({
   user: state.auth.user,
 });
 
-export default connect(mapStateToProps, { signOut, setQuery })(
-  withRouter(Navigation)
-);
+export default connect(mapStateToProps, {
+  signOut,
+  setQuery,
+  setCategory,
+  setSubcategory,
+})(withRouter(Navigation));
