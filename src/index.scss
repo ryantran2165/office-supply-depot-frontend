@@ -7,6 +7,15 @@ body {
   height: 500px;
 }
 
+#search-nav {
+  @media only screen and (min-width: 576px) {
+    width: 75%;
+  }
+  @media only screen and (min-width: 768px) {
+    width: 50%;
+  }
+}
+
 #search-dropdown {
   border-radius: 0;
   border-top: 1px solid gray;
@@ -28,7 +37,7 @@ body {
   border-bottom: 1px solid gray;
   border-left: 1px solid gray;
   border-right: 0;
-  flex: 10;
+  flex: 20;
 
   &:focus {
     box-shadow: none;
@@ -48,6 +57,17 @@ body {
   &:focus {
     box-shadow: none;
   }
+}
+
+.submenu-button > button,
+.submenu-button > button:hover,
+.submenu-button > button:active,
+.submenu-button > button:focus {
+  color: #212529 !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0.25rem 1.5rem !important;
 }
 
 .account-form {

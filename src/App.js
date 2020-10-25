@@ -6,6 +6,7 @@ import { connect } from "react-redux";
 import { checkSignedIn, checkDriverSignedIn } from "./actions/auth-actions";
 import Navigation from "./components/navigation/navigation";
 import Home from "./components/home/home";
+import Products from "./components/products/products";
 import SignIn from "./components/account/sign-in";
 import SignUp from "./components/account/sign-up";
 import Account from "./components/account/account";
@@ -29,6 +30,12 @@ class App extends Component {
     return (
       <BrowserRouter>
         <Switch>
+          <Route path="/products">
+            <React.Fragment>
+              <Navigation />
+              <Products />
+            </React.Fragment>
+          </Route>
           <RestrictedRoute
             path="/sign-in"
             component={SignIn}
