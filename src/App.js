@@ -15,7 +15,7 @@ import DriverSignIn from "./components/driver/driver-sign-in";
 import DriverNavigation from "./components/driver/driver-navigation";
 import Driver from "./components/driver/driver";
 
-export const IS_LOCAL = true;
+export const IS_LOCAL = false;
 export const API_URL = IS_LOCAL
   ? "http://localhost:8000"
   : "https://office-supply-depot-backend.herokuapp.com";
