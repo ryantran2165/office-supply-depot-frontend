@@ -16,7 +16,7 @@ import Button from "react-bootstrap/Button";
 import Dropdown from "react-bootstrap/Dropdown";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import { FaSearch } from "react-icons/fa";
-import productCategories from "../product-categories";
+import PRODUCT_CATEGORIES from "../product-categories";
 
 class Navigation extends Component {
   constructor(props) {
@@ -48,7 +48,7 @@ class Navigation extends Component {
   };
 
   getNavDropdowns() {
-    return productCategories.map((productCategory) => {
+    return PRODUCT_CATEGORIES.map((productCategory) => {
       const category = productCategory[0];
       const subcategories = productCategory[1];
 

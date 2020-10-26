@@ -1,4 +1,4 @@
-const productCategories = [
+const PRODUCT_CATEGORIES = [
   [
     "Office Supplies",
     [
@@ -25,4 +25,4 @@ const productCategories = [
   ],
 ];
 
-export default productCategories;
+export default PRODUCT_CATEGORIES;
