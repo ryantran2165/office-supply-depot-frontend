@@ -7,6 +7,7 @@ import { checkSignedIn, checkDriverSignedIn } from "./actions/auth-actions";
 import Navigation from "./components/navigation/navigation";
 import Home from "./components/home/home";
 import Products from "./components/products/products";
+import Product from "./components/products/product";
 import SignIn from "./components/account/sign-in";
 import SignUp from "./components/account/sign-up";
 import Account from "./components/account/account";
@@ -30,6 +31,12 @@ class App extends Component {
     return (
       <BrowserRouter>
         <Switch>
+          <Route path="/products/:id">
+            <React.Fragment>
+              <Navigation />
+              <Product />
+            </React.Fragment>
+          </Route>
           <Route path="/products">
             <React.Fragment>
               <Navigation />
