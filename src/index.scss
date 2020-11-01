@@ -159,7 +159,7 @@ hr {
   text-align: right;
 }
 
-page-button {
+.page-button {
   display: flex;
   flex: 1;
 }
@@ -168,5 +168,20 @@ page-button {
   flex: 2;
   align-content: center;
   justify-content: center;
+}
+
+.button-image {
+  
+  background-repeat:no-repeat;
+  background-position : center center;
+  color: lightgrey;
+}
+
+.back-icon {
+  background-image : url(./icons/back-icon.png);
+}
+
+.next-icon {
+  background-image : url(./icons/next-icon.png);
 }
 /* END PRODUCT */

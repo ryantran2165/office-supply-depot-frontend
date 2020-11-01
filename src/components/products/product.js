@@ -53,7 +53,8 @@ function Product() {
             <p className="align mr-5">Page of </p>
             <div className="d-flex flex-row align-items-center">
               <div>
-                <Button className="m-3 align-self-start button-round">+</Button>
+                <Button className="m-3 align-self-start  btn-light button-round button-image back-icon">
+                </Button>
               </div>
               <div>
               <Image className="p-3 product-image" fluid src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"/>
@@ -71,7 +72,8 @@ function Product() {
                 <Image className="p-3 product-image" fluid src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"/>
               </div>
               <div>
-                <Button className="m-3 align-self-start button-round">+</Button>
+                <Button className="m-3 align-self-start btn-light button-round button-image next-icon">
+                </Button>
               </div>
             </div>
             
