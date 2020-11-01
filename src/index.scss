@@ -113,8 +113,17 @@ body {
   box-sizing: border-box;
 }
 
+.category-text-size {
+  font-size: 15px;
+}
+
+.gray-text {
+  color: gray;
+}
+
 .product-description {
   width: 80%;
+  font-size: 20px;
 }
 
 .button-round {
@@ -124,7 +133,7 @@ body {
   text-align: center;
 }
 
-.qty-label {
+.product-detail {
   font-size: 18px;
 }
 
@@ -140,4 +149,24 @@ body {
   width: 200px;
 }
 
+hr {
+  width: 95%;
+  border: none;
+  
+}
+
+.align {
+  text-align: right;
+}
+
+page-button {
+  display: flex;
+  flex: 1;
+}
+
+.flex-setting {
+  flex: 2;
+  align-content: center;
+  justify-content: center;
+}
 /* END PRODUCT */
