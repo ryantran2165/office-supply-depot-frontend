@@ -5,10 +5,15 @@ import { API_URL } from "../../App";
 import Container from "react-bootstrap/Container";
 import { Col, Row, Image, Button } from "react-bootstrap";
 
+const ITEMS_PER_PAGE = 5;
+const TOTAL_PAGE = 5;
+
 function Product() {
   // State
   let { id } = useParams();
   const [product, setProduct] = useState(null);
+  const [similarProducts, setSimilarProducts] = useState(null);
+  const [page, setPage] = useState(1);
 
   // On mount, get product details from backend
   useEffect(() => {
@@ -18,7 +23,7 @@ function Product() {
     console.log(product);
   }, [id]);
   
- 
+
   // Make sure product is not null before rendering
   return (
     <Container fluid className="pb-5">
