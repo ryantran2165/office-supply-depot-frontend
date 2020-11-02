@@ -103,3 +103,46 @@ body {
   }
 }
 /* END ACCOUNT*/
+
+/* PRODUCT */
+.category-text-size {
+  font-size: 15px;
+}
+
+.gray-text {
+  color: gray;
+}
+
+.product-description {
+  width: 80%;
+  font-size: 20px;
+}
+
+.button-round {
+  border-radius: 50% !important;
+  width: 40px;
+  height: 40px;
+  text-align: center;
+}
+
+.product-detail {
+  font-size: 18px;
+}
+
+.quantity-input {
+  width: 50px;
+  height: 40px;
+  border: none;
+  text-align: center;
+  font-size: 20px;
+}
+
+.add-to-cart-button {
+  width: 200px;
+}
+
+hr {
+  width: 95%;
+  border: none;
+}
+/* END PRODUCT */
