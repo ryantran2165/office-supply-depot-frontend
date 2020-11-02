@@ -5,15 +5,10 @@ import { API_URL } from "../../App";
 import Container from "react-bootstrap/Container";
 import { Col, Row, Image, Button } from "react-bootstrap";
 
-const ITEMS_PER_PAGE = 5;
-const TOTAL_PAGE = 5;
-
 function Product() {
   // State
   let { id } = useParams();
   const [product, setProduct] = useState(null);
-  const [similarProducts, setSimilarProducts] = useState(null);
-  const [page, setPage] = useState(1);
 
   // On mount, get product details from backend
   useEffect(() => {
@@ -29,7 +24,7 @@ function Product() {
     <Container fluid className="pb-5">
       {product ? (
         <div>
-          <Row className="pt-5 justtify-content-center ml-5 pb-4 mb-4">
+          <Row className="pt-5 justtify-content-center ml-5 pb-4">
             <Col>
               <Image className="product-image" fluid src={product.img_url}/>
             </Col>
@@ -54,42 +49,29 @@ function Product() {
             </Row>
             <hr/>
             <h4 className="text-center">More from categories</h4>
-            <hr/>
-            <p className="align mr-5">Page of </p>
-            <div className="d-flex flex-row align-items-center">
+            <hr className="pb-4"/>
+            <div className="d-flex justify-content-center px-5">
               <div>
-                <Button className="m-3 align-self-start  btn-light button-round button-image back-icon">
-                </Button>
+              <Image className="pb-3 px-3" fluid src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"/>
               </div>
               <div>
-              <Image className="p-3 product-image" fluid src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"/>
+                <Image className="pb-3 px-3" fluid src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"/>
               </div>
               <div>
-                <Image className="p-3 product-image" fluid src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"/>
+                <Image className="pb-3 px-3" fluid src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"/>
               </div>
               <div>
-                <Image className="p-3 product-image" fluid src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"/>
+                <Image className="pb-3 px-3" fluid src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"/>
               </div>
               <div>
-                <Image className="p-3 product-image" fluid src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"/>
-              </div>
-              <div>
-                <Image className="p-3 product-image" fluid src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"/>
-              </div>
-              <div>
-                <Button className="m-3 align-self-start btn-light button-round button-image next-icon">
-                </Button>
+                <Image className="pb-3 px-3" fluid src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"/>
               </div>
             </div>
-            
         </div>
        
       ): ""}
     </Container>
   );
-
-
-  
 }
 
 export default Product;

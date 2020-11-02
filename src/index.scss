@@ -105,14 +105,6 @@ body {
 /* END ACCOUNT*/
 
 /* PRODUCT */
-.product-image {
-  align-items: center;
-}
-
-.box-sizing {
-  box-sizing: border-box;
-}
-
 .category-text-size {
   font-size: 15px;
 }
@@ -152,36 +144,5 @@ body {
 hr {
   width: 95%;
   border: none;
-  
-}
-
-.align {
-  text-align: right;
-}
-
-.page-button {
-  display: flex;
-  flex: 1;
-}
-
-.flex-setting {
-  flex: 2;
-  align-content: center;
-  justify-content: center;
-}
-
-.button-image {
-  
-  background-repeat:no-repeat;
-  background-position : center center;
-  color: lightgrey;
-}
-
-.back-icon {
-  background-image : url(./icons/back-icon.png);
-}
-
-.next-icon {
-  background-image : url(./icons/next-icon.png);
 }
 /* END PRODUCT */
