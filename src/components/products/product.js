@@ -8,6 +8,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Image from "react-bootstrap/Image";
 import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
 
 function Product() {
   let { id } = useParams();
@@ -22,6 +23,11 @@ function Product() {
     // Get product details from backend
     axios.get(`${API_URL}/products/${id}`).then((res) => {
       setProduct(res.data);
+
+      // Out of stock
+      if (res.data.inventory === 0) {
+        setQuantity(0);
+      }
     });
 
     // Check if this product is in cart
@@ -51,6 +57,14 @@ function Product() {
       newQuantity = product.inventory;
     }
     setQuantity(newQuantity);
+  }
+
+  function handleOnChangeQuantity(e) {
+    const re = /^\d{1,3}$/;
+    const newQuantity = parseInt(e.target.value);
+    if (re.test(newQuantity)) {
+      handleOnClickQuantity(newQuantity);
+    }
   }
 
   function handleOnClickCart() {
@@ -90,8 +104,9 @@ function Product() {
           <Image fluid src={product.img_url} />
         </Col>
         <Col className="ml-3" xs={12} lg={5}>
-          <pre className="gray-text category-text-size">
-            {product.category} | {product.subcategory}
+          <pre className="category-tag">
+            {product.category}
+            {product.subcategory !== "" ? ` | ${product.subcategory}` : ""}
           </pre>
           <h3>{product.name}</h3>
           <p className="product-description mt-3">{product.description}</p>
@@ -120,13 +135,21 @@ function Product() {
                   <Button
                     className="button-round"
                     onClick={() => handleOnClickQuantity(quantity - 1)}
+                    disabled={product.inventory === 0}
                   >
                     -
                   </Button>
-                  <span className="mx-3">{quantity}</span>
+                  <Form.Control
+                    type="text"
+                    value={quantity}
+                    className="quantity-input mx-3"
+                    onChange={handleOnChangeQuantity}
+                    disabled={product.inventory === 0}
+                  />
                   <Button
                     className="button-round"
                     onClick={() => handleOnClickQuantity(quantity + 1)}
+                    disabled={product.inventory === 0}
                   >
                     +
                   </Button>
@@ -138,6 +161,7 @@ function Product() {
             className="add-to-cart-button mt-3"
             value="Add to cart"
             onClick={handleOnClickCart}
+            disabled={product.inventory === 0 && cartID === -1} // Always allow remove from cart
           >
             {cartID === -1 ? "Add to cart" : "Remove from cart"}
           </Button>

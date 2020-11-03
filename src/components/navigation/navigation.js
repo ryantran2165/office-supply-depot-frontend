@@ -52,6 +52,20 @@ class Navigation extends Component {
       const category = productCategory[0];
       const subcategories = productCategory[1];
 
+      // No subcategories
+      if (subcategories.length === 0) {
+        return (
+          <NavDropdown.Item
+            className="no-submenu-navdropdown-item"
+            onClick={() => this.handleNavOnClick(category, "")}
+            key={category}
+          >
+            {category}
+          </NavDropdown.Item>
+        );
+      }
+
+      // Has subcategories, dropdown
       return (
         <NavDropdown
           title={category}
