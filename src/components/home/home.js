@@ -63,7 +63,7 @@ function Home() {
               </Carousel.Caption>
             </Carousel.Item>
           </Carousel>
-          <h1 className="text-center mt-3 mb-3">Shop by Category</h1>
+          <h1 className="text-center mt-3 mb-3">Popular Categories</h1>
           <Row className="justify-content-center text-center">
             <HomeCategory
               categoryName="Category 1"

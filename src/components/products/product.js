@@ -1,75 +1,187 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
+import { useSelector } from "react-redux";
 import axios from "axios";
 import { API_URL } from "../../App";
 import Container from "react-bootstrap/Container";
-import { Col, Row, Image, Button } from "react-bootstrap";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import Image from "react-bootstrap/Image";
+import Button from "react-bootstrap/Button";
 
 function Product() {
-  // State
   let { id } = useParams();
   const [product, setProduct] = useState(null);
+  const [quantity, setQuantity] = useState(1);
+  const [cartID, setCartID] = useState(-1);
+  const history = useHistory();
+  const signedIn = useSelector((state) => state.auth.signedIn);
 
-  // On mount, get product details from backend
+  // On mount
   useEffect(() => {
+    // Get product details from backend
     axios.get(`${API_URL}/products/${id}`).then((res) => {
       setProduct(res.data);
     });
-    console.log(product);
-  }, [id]);
-  
+
+    // Check if this product is in cart
+    if (signedIn) {
+      const header = {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem("token")}`,
+        },
+      };
+      axios.get(`${API_URL}/carts/`, header).then((res) => {
+        const cart = res.data;
+        for (let item of cart) {
+          if (item.product === parseInt(id)) {
+            setCartID(item.id);
+            break;
+          }
+        }
+      });
+    }
+  }, [id, signedIn]);
+
+  function handleOnClickQuantity(newQuantity) {
+    // Clamp quantity [1, product.inventory]
+    if (newQuantity < 1) {
+      newQuantity = 1;
+    } else if (newQuantity > product.inventory) {
+      newQuantity = product.inventory;
+    }
+    setQuantity(newQuantity);
+  }
+
+  function handleOnClickCart() {
+    if (signedIn) {
+      const header = {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem("token")}`,
+        },
+      };
+
+      // Does not have item, add to cart (POST)
+      if (cartID === -1) {
+        const data = { product: id, quantity: quantity };
+        axios.post(`${API_URL}/carts/`, data, header).then((res) => {
+          setCartID(res.data.id);
+        });
+      } else {
+        // Has product in cart, remove from cart (DELETE)
+        axios.delete(`${API_URL}/carts/${cartID}`, header).then((res) => {
+          setCartID(-1);
+        });
+      }
+    } else {
+      history.push("/sign-in");
+    }
+  }
 
   // Make sure product is not null before rendering
+  if (product === null) {
+    return "";
+  }
+
   return (
-    <Container fluid className="pb-5">
-      {product ? (
-        <div>
-          <Row className="pt-5 justtify-content-center ml-5 pb-4">
+    <Container fluid className="py-5">
+      <Row className="justify-content-center">
+        <Col xs={12} lg={5}>
+          <Image fluid src={product.img_url} />
+        </Col>
+        <Col className="ml-3" xs={12} lg={5}>
+          <pre className="gray-text category-text-size">
+            {product.category} | {product.subcategory}
+          </pre>
+          <h3>{product.name}</h3>
+          <p className="product-description mt-3">{product.description}</p>
+          <h4 className="mt-3">${product.price}</h4>
+          <Row className="product-detail">
+            <Col xs="auto">
+              <Row className="mt-3">
+                <Col>Weight:</Col>
+              </Row>
+              <Row className="mt-3">
+                <Col>Inventory:</Col>
+              </Row>
+              <Row className="mt-3">
+                <Col>Quantity:</Col>
+              </Row>
+            </Col>
             <Col>
-              <Image className="product-image" fluid src={product.img_url}/>
+              <Row className="mt-3">
+                <Col>{product.weight} lbs</Col>
+              </Row>
+              <Row className="mt-3">
+                <Col>{product.inventory} in stock</Col>
+              </Row>
+              <Row className="mt-3">
+                <Col>
+                  <Button
+                    className="button-round"
+                    onClick={() => handleOnClickQuantity(quantity - 1)}
+                  >
+                    -
+                  </Button>
+                  <span className="mx-3">{quantity}</span>
+                  <Button
+                    className="button-round"
+                    onClick={() => handleOnClickQuantity(quantity + 1)}
+                  >
+                    +
+                  </Button>
+                </Col>
+              </Row>
             </Col>
-            <Col className="ml-3">
-              <pre className="gray-text category-text-size">{product.category} | {product.subcategory}</pre>
-              <h3>{product.name}</h3>
-              <p className="product-description mt-3">{product.description}</p>
-              <h4 className="mt-3 mb-3">${product.price}</h4>
-              <span className="mt-3 product-detail">Weight&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{product.weight} lbs</span>
-              <form className="mt-3" method="post">
-                <div>
-                  <Row>
-                    <label className="product-detail pl-3 mr-3 mt-1">Quantity</label>
-                    <Button className="button-round mr-2">-</Button>
-                    <input className="quantity-input" type="text" value="1"/>
-                    <Button className="button-round ml-2">+</Button>
-                    <Button className="add-to-cart-button ml-4" type="submit" value="Add to cart">Add to cart</Button>
-                  </Row>
-                </div>
-              </form>
-            </Col>
-            </Row>
-            <hr/>
-            <h4 className="text-center">More from categories</h4>
-            <hr className="pb-4"/>
-            <div className="d-flex justify-content-center px-5">
-              <div>
-              <Image className="pb-3 px-3" fluid src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"/>
-              </div>
-              <div>
-                <Image className="pb-3 px-3" fluid src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"/>
-              </div>
-              <div>
-                <Image className="pb-3 px-3" fluid src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"/>
-              </div>
-              <div>
-                <Image className="pb-3 px-3" fluid src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"/>
-              </div>
-              <div>
-                <Image className="pb-3 px-3" fluid src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"/>
-              </div>
-            </div>
-        </div>
-       
-      ): ""}
+          </Row>
+          <Button
+            className="add-to-cart-button mt-3"
+            value="Add to cart"
+            onClick={handleOnClickCart}
+          >
+            {cartID === -1 ? "Add to cart" : "Remove from cart"}
+          </Button>
+        </Col>
+      </Row>
+      <Row className="my-4">
+        <Col>
+          <hr className="product-hr" />
+          <h4 className="text-center">Similar Products</h4>
+          <hr className="product-hr" />
+        </Col>
+      </Row>
+      <Row className="mx-5">
+        <Col>
+          <Image
+            fluid
+            src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"
+          />
+        </Col>
+        <Col>
+          <Image
+            fluid
+            src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"
+          />
+        </Col>
+        <Col>
+          <Image
+            fluid
+            src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"
+          />
+        </Col>
+        <Col>
+          <Image
+            fluid
+            src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"
+          />
+        </Col>
+        <Col>
+          <Image
+            fluid
+            src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"
+          />
+        </Col>
+      </Row>
     </Container>
   );
 }

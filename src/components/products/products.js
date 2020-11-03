@@ -32,16 +32,32 @@ class Products extends Component {
     this.getProducts();
   }
 
-  componentDidUpdate() {}
+  componentDidUpdate(prevProps) {
+    // Changed query, category, or subcategory
+    if (
+      prevProps.query !== this.props.query ||
+      prevProps.category !== this.props.category ||
+      prevProps.subcategory !== this.props.subcategory
+    ) {
+      this.getProducts();
+    }
+  }
 
   getProducts = () => {
-    axios
-      .get(
-        `${API_URL}/products/?items=${ITEMS_PER_PAGE}&page=${this.state.page}`
-      )
-      .then((res) => {
-        this.setState({ products: res.data.products, count: res.data.count });
-      });
+    let queryParams = `?items=${ITEMS_PER_PAGE}&page=${this.state.page}`;
+    if (this.props.query !== "") {
+      queryParams += `&query=${this.props.query}`;
+    }
+    if (this.props.category !== "") {
+      queryParams += `&category=${this.props.category}`;
+    }
+    if (this.props.subcategory !== "") {
+      queryParams += `&subcategory=${this.props.subcategory}`;
+    }
+
+    axios.get(`${API_URL}/products/${queryParams}`).then((res) => {
+      this.setState({ products: res.data.products, count: res.data.count });
+    });
   };
 
   getGrid() {
@@ -240,9 +256,12 @@ class Products extends Component {
   render() {
     return (
       <Container fluid className="pb-5">
-        <Row className="mt-3 mb-3">
+        <Row className="my-3">
           <Col>
-            <h5>Showing {this.state.count} results</h5>
+            <h5>
+              Showing {this.state.count} results{" "}
+              {this.props.query !== "" ? `for "${this.props.query}"` : ""}
+            </h5>
           </Col>
           <Col>{/* SORT MULTI-SELECT HERE */}</Col>
         </Row>
