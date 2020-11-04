@@ -9,26 +9,31 @@ import Col from "react-bootstrap/Col";
 import Image from "react-bootstrap/Image";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
+import ProductBox from "./product-box";
+
+const NUM_SIMILAR = 4;
 
 function Product() {
-  let { id } = useParams();
+  const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [cartID, setCartID] = useState(-1);
+  const [similar, setSimilar] = useState([]);
+  const [notFound, setNotFound] = useState(false);
   const history = useHistory();
   const signedIn = useSelector((state) => state.auth.signedIn);
 
-  // On mount
   useEffect(() => {
     // Get product details from backend
-    axios.get(`${API_URL}/products/${id}`).then((res) => {
-      setProduct(res.data);
-
-      // Out of stock
-      if (res.data.inventory === 0) {
-        setQuantity(0);
-      }
-    });
+    axios
+      .get(`${API_URL}/products/${id}`)
+      .then((res) => {
+        setProduct(res.data);
+        setQuantity(res.data.inventory === 0 ? 0 : 1);
+      })
+      .catch((err) => {
+        setNotFound(true);
+      });
 
     // Check if this product is in cart
     if (signedIn) {
@@ -47,6 +52,13 @@ function Product() {
         }
       });
     }
+
+    // Get similar products
+    axios
+      .get(`${API_URL}/products/list_similar/?id=${id}&items=${NUM_SIMILAR}`)
+      .then((res) => {
+        setSimilar(res.data);
+      });
   }, [id, signedIn]);
 
   function handleOnClickQuantity(newQuantity) {
@@ -63,51 +75,66 @@ function Product() {
     const re = /^\d{1,3}$/;
     const newQuantity = parseInt(e.target.value);
     if (re.test(newQuantity)) {
+      // Clamps and sets new quantity
       handleOnClickQuantity(newQuantity);
     }
   }
 
   function handleOnClickCart() {
-    if (signedIn) {
-      const header = {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem("token")}`,
-        },
-      };
-
-      // Does not have item, add to cart (POST)
-      if (cartID === -1) {
-        const data = { product: id, quantity: quantity };
-        axios.post(`${API_URL}/carts/`, data, header).then((res) => {
-          setCartID(res.data.id);
-        });
-      } else {
-        // Has product in cart, remove from cart (DELETE)
-        axios.delete(`${API_URL}/carts/${cartID}`, header).then((res) => {
-          setCartID(-1);
-        });
-      }
-    } else {
+    // Must sign in to add to cart
+    if (!signedIn) {
       history.push("/sign-in");
+      return;
+    }
+
+    const header = {
+      headers: {
+        Authorization: `JWT ${localStorage.getItem("token")}`,
+      },
+    };
+
+    // Does not have item, add to cart (POST)
+    if (cartID === -1) {
+      const data = { product: id, quantity: quantity };
+      axios.post(`${API_URL}/carts/`, data, header).then((res) => {
+        setCartID(res.data.id);
+      });
+    } else {
+      // Has product in cart, remove from cart (DELETE)
+      axios.delete(`${API_URL}/carts/${cartID}`, header).then((res) => {
+        setCartID(-1);
+      });
     }
   }
 
   // Make sure product is not null before rendering
   if (product === null) {
+    if (notFound) {
+      return (
+        <Container className="py-5 text-center">
+          <h1>No Product Found!</h1>
+        </Container>
+      );
+    }
     return "";
   }
 
   return (
-    <Container fluid className="py-5">
+    <Container fluid className="py-5 px-md-5">
       <Row className="justify-content-center">
-        <Col xs={12} lg={5}>
-          <Image fluid src={product.img_url} />
+        <Col xs={12} md={6} className="mb-3">
+          <Image
+            fluid
+            rounded
+            src={product.img_url}
+            className="product-img shadow"
+          />
         </Col>
-        <Col className="ml-3" xs={12} lg={5}>
-          <pre className="category-tag">
+        <Col xs={12} md={6}>
+          <p className="category-tag">
             {product.category}
             {product.subcategory !== "" ? ` | ${product.subcategory}` : ""}
-          </pre>
+          </p>
           <h3>{product.name}</h3>
           <p className="product-description mt-3">{product.description}</p>
           <h4 className="mt-3">${product.price}</h4>
@@ -167,45 +194,22 @@ function Product() {
           </Button>
         </Col>
       </Row>
-      <Row className="my-4">
-        <Col>
-          <hr className="product-hr" />
-          <h4 className="text-center">Similar Products</h4>
-          <hr className="product-hr" />
-        </Col>
-      </Row>
-      <Row className="mx-5">
-        <Col>
-          <Image
-            fluid
-            src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"
-          />
-        </Col>
-        <Col>
-          <Image
-            fluid
-            src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"
-          />
-        </Col>
-        <Col>
-          <Image
-            fluid
-            src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"
-          />
-        </Col>
-        <Col>
-          <Image
-            fluid
-            src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"
-          />
-        </Col>
-        <Col>
-          <Image
-            fluid
-            src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"
-          />
-        </Col>
-      </Row>
+      {similar.length > 0 && (
+        <React.Fragment>
+          <Row className="my-4">
+            <Col>
+              <hr />
+              <h4 className="text-center">Similar Products</h4>
+              <hr />
+            </Col>
+          </Row>
+          <Row className="justify-content-center">
+            {similar.map((similarProduct) => (
+              <ProductBox product={similarProduct} key={similarProduct.id} />
+            ))}
+          </Row>
+        </React.Fragment>
+      )}
     </Container>
   );
 }

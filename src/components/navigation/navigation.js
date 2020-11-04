@@ -88,7 +88,7 @@ class Navigation extends Component {
 
   render() {
     return (
-      <Navbar bg="light" expand="md" className="pt-3">
+      <Navbar bg="light" expand="md" className="pt-3 px-md-5">
         <Link to="/" className="navbar-brand">
           <img
             src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"

@@ -13,7 +13,7 @@ function Home() {
   };
 
   return (
-    <Container fluid className="pb-5">
+    <Container fluid className="pb-5 px-md-5">
       <Row>
         <Col>
           <Carousel

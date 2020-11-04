@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import axios from "axios";
 import { API_URL } from "../../App";
@@ -10,13 +9,11 @@ import Col from "react-bootstrap/Col";
 import Accordion from "react-bootstrap/Accordion";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
-import Image from "react-bootstrap/Image";
 import Pagination from "react-bootstrap/Pagination";
 import PRODUCT_CATEGORIES from "../product-categories";
+import ProductBox from "./product-box";
 
 const ITEMS_PER_PAGE = 20;
-const ROWS = 5;
-const COLS = 4;
 
 class Products extends Component {
   constructor(props) {
@@ -59,52 +56,6 @@ class Products extends Component {
       this.setState({ products: res.data.products, count: res.data.count });
     });
   };
-
-  getGrid() {
-    const grid = [];
-
-    for (let r = 0; r < ROWS; r++) {
-      const cols = [];
-      let outOfProducts = false;
-
-      for (let c = 0; c < COLS; c++) {
-        // Out of products
-        if (r * COLS + c > this.state.products.length - 1) {
-          outOfProducts = true;
-          break;
-        }
-
-        // Add product column
-        const product = this.state.products[r * COLS + c];
-        cols.push(
-          <Col key={product.name} xs={3}>
-            <Link to={`/products/${product.id}`}>
-              <Image fluid rounded src={product.img_url} />
-              <h5>{product.name}</h5>
-              <h5>${product.price}</h5>
-            </Link>
-          </Col>
-        );
-      }
-
-      // Cols may be empty because possibly out of products on start of new row
-      if (cols.length !== 0) {
-        grid.push(
-          <React.Fragment key={`row-${r}`}>
-            {r > 0 && <hr />}
-            <Row className="">{cols}</Row>
-          </React.Fragment>
-        );
-      }
-
-      // Out of products, done
-      if (outOfProducts) {
-        break;
-      }
-    }
-
-    return grid;
-  }
 
   getPagination() {
     const lastPage = Math.ceil(this.state.count / ITEMS_PER_PAGE);
@@ -255,7 +206,7 @@ class Products extends Component {
 
   render() {
     return (
-      <Container fluid className="pb-5">
+      <Container fluid className="pb-5 px-md-5">
         <Row className="my-3">
           <Col>
             <h5>
@@ -287,7 +238,11 @@ class Products extends Component {
             </Accordion>
           </Col>
           <Col>
-            {this.getGrid()}
+            <Row>
+              {this.state.products.map((product) => {
+                return <ProductBox product={product} key={product.id} />;
+              })}
+            </Row>
             {this.getPagination()}
           </Col>
         </Row>
