@@ -8,6 +8,7 @@ body {
 /* HOME */
 .carousel-item > img {
   height: 500px;
+  object-fit: cover;
 }
 /* END HOME */
 
@@ -112,13 +113,45 @@ body {
 }
 /* END ACCOUNT*/
 
-/* PRODUCT */
-.product-box-img {
+/* PRODUCTS */
+.accordion .card-header {
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.filter-link {
+  color: black;
+
+  &.active {
+    color: #007bff;
+  }
+}
+
+.filter-input-group {
+  width: 100px !important;
+
+  & input {
+    text-align: center;
+  }
+}
+
+.product-box img {
   width: 100%;
-  height: 200px !important;
+  height: 200px;
   object-fit: cover;
 }
 
+.product-box a {
+  color: black;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+/* END PRODUCTS */
+
+/* PRODUCT */
 .product-img {
   width: 100%;
   height: 400px !important;

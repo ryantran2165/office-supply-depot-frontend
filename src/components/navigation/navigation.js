@@ -33,8 +33,10 @@ class Navigation extends Component {
   handleOnSubmit = (e) => {
     e.preventDefault();
 
-    // Query always resets category and subcategory
+    // Query resets category and subcategory
     this.props.setQuery(this.state.query);
+    this.props.setCategory("");
+    this.props.setSubcategory("");
     this.props.history.push("/products");
   };
 
@@ -48,9 +50,8 @@ class Navigation extends Component {
   };
 
   getNavDropdowns() {
-    return PRODUCT_CATEGORIES.map((productCategory) => {
-      const category = productCategory[0];
-      const subcategories = productCategory[1];
+    return Object.keys(PRODUCT_CATEGORIES).map((category) => {
+      const subcategories = PRODUCT_CATEGORIES[category];
 
       // No subcategories
       if (subcategories.length === 0) {
@@ -68,8 +69,8 @@ class Navigation extends Component {
       // Has subcategories, dropdown
       return (
         <NavDropdown
-          title={category}
           className="submenu"
+          title={category}
           drop="right"
           key={category}
         >
@@ -88,8 +89,8 @@ class Navigation extends Component {
 
   render() {
     return (
-      <Navbar bg="light" expand="md" className="pt-3 px-md-5">
-        <Link to="/" className="navbar-brand">
+      <Navbar className="pt-3 px-md-5" bg="light" expand="md">
+        <Link className="navbar-brand" to="/">
           <img
             src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"
             width="75"
@@ -97,7 +98,7 @@ class Navigation extends Component {
             alt="OSD logo"
           />
         </Link>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Toggle />
         <Navbar.Collapse className="mt-3 mt-md-0">
           <Nav id="search-nav" className="mx-md-auto">
             <Form inline className="w-100" onSubmit={this.handleOnSubmit}>
@@ -110,41 +111,41 @@ class Navigation extends Component {
                 type="text"
                 placeholder="Search"
                 id="search-box"
-                value={this.state.query}
                 name="query"
+                value={this.state.query}
                 onChange={this.handleOnChange}
               />
-              <Button type="submit" id="search-button">
+              <Button id="search-button" type="submit">
                 <FaSearch />
               </Button>
             </Form>
             {/*Dropdown for mobile only*/}
-            <NavDropdown title="Products" className="d-md-none">
+            <NavDropdown className="d-md-none" title="Products">
               {this.getNavDropdowns()}
             </NavDropdown>
           </Nav>
           <Nav>
             <Nav.Item>
               {this.props.signedIn && this.props.user !== null ? (
-                <Link to="/account" className="nav-link">
+                <Link className="nav-link" to="/account">
                   Hi {this.props.user.first_name}
                 </Link>
               ) : (
-                <Link to="/sign-in" className="nav-link">
+                <Link className="nav-link" to="/sign-in">
                   Account
                 </Link>
               )}
             </Nav.Item>
             {this.props.signedIn && (
               <Nav.Item>
-                <Link to="/cart" className="nav-link">
+                <Link className="nav-link" to="/cart">
                   Cart
                 </Link>
               </Nav.Item>
             )}
             {this.props.signedIn && (
               <Nav.Item>
-                <Link to="/" className="nav-link" onClick={this.props.signOut}>
+                <Link className="nav-link" to="/" onClick={this.props.signOut}>
                   Sign out
                 </Link>
               </Nav.Item>

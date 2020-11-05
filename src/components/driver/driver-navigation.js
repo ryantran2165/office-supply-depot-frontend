@@ -9,12 +9,12 @@ import Nav from "react-bootstrap/Nav";
 class DriverNavigation extends Component {
   render() {
     return (
-      <Navbar bg="light" expand="md" className="justify-content-center pt-3">
-        <Link to="/" className="navbar-brand">
+      <Navbar className="justify-content-center pt-3" bg="light" expand="md">
+        <Link className="navbar-brand" to="/">
           Office Supply Depot
         </Link>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
+        <Navbar.Toggle />
+        <Navbar.Collapse>
           <Nav className="ml-auto">
             <Navbar.Text>
               Hi{" "}
@@ -22,8 +22,8 @@ class DriverNavigation extends Component {
             </Navbar.Text>
             <Nav.Item>
               <Link
-                to="/driver-sign-in"
                 className="nav-link"
+                to="/driver-sign-in"
                 onClick={this.props.driverSignOut}
               >
                 Sign out

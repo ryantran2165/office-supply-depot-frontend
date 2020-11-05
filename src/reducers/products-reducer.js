@@ -9,12 +9,9 @@ const initialState = {
 export default function (state = initialState, action) {
   switch (action.type) {
     case SET_QUERY:
-      // Query always resets category and subcategory
       return {
         ...state,
         query: action.payload,
-        category: "",
-        subcategory: "",
       };
     case SET_CATEGORY:
       return {

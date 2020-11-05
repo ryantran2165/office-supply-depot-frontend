@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
 import { useSelector } from "react-redux";
 import axios from "axios";
-import { API_URL } from "../../App";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -10,6 +9,7 @@ import Image from "react-bootstrap/Image";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import ProductBox from "./product-box";
+import { API_URL } from "../../App";
 
 const NUM_SIMILAR = 4;
 
@@ -62,20 +62,16 @@ function Product() {
   }, [id, signedIn]);
 
   function handleOnClickQuantity(newQuantity) {
-    // Clamp quantity [1, product.inventory]
-    if (newQuantity < 1) {
-      newQuantity = 1;
-    } else if (newQuantity > product.inventory) {
-      newQuantity = product.inventory;
-    }
+    newQuantity = Math.max(newQuantity, 1);
+    newQuantity = Math.min(newQuantity, product.inventory);
     setQuantity(newQuantity);
   }
 
   function handleOnChangeQuantity(e) {
     const re = /^\d{1,3}$/;
     const newQuantity = parseInt(e.target.value);
+
     if (re.test(newQuantity)) {
-      // Clamps and sets new quantity
       handleOnClickQuantity(newQuantity);
     }
   }
@@ -111,7 +107,7 @@ function Product() {
   if (product === null) {
     if (notFound) {
       return (
-        <Container className="py-5 text-center">
+        <Container className="text-center py-5">
           <h1>No Product Found!</h1>
         </Container>
       );
@@ -122,12 +118,12 @@ function Product() {
   return (
     <Container fluid className="py-5 px-md-5">
       <Row className="justify-content-center">
-        <Col xs={12} md={6} className="mb-3">
+        <Col className="mb-3" xs={12} md={6}>
           <Image
             fluid
             rounded
-            src={product.img_url}
             className="product-img shadow"
+            src={product.img_url}
           />
         </Col>
         <Col xs={12} md={6}>
@@ -167,9 +163,9 @@ function Product() {
                     -
                   </Button>
                   <Form.Control
+                    className="quantity-input mx-3"
                     type="text"
                     value={quantity}
-                    className="quantity-input mx-3"
                     onChange={handleOnChangeQuantity}
                     disabled={product.inventory === 0}
                   />
