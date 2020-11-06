@@ -9,12 +9,13 @@ import { API_URL } from "../App";
 
 export const checkSignedIn = () => (dispatch) => {
   // Called on mount (load/refresh)
+  const header = {
+    headers: {
+      Authorization: `JWT ${localStorage.getItem("token")}`,
+    },
+  };
   axios
-    .get(`${API_URL}/users/current-user/`, {
-      headers: {
-        Authorization: `JWT ${localStorage.getItem("token")}`,
-      },
-    })
+    .get(`${API_URL}/users/current-user/`, header)
     .then((res) => {
       // Token not expired, set user
       dispatch({
@@ -95,12 +96,13 @@ export const signOut = () => (dispatch) => {
 
 export const checkDriverSignedIn = () => (dispatch) => {
   // Called on mount (load/refresh)
+  const header = {
+    headers: {
+      Authorization: `JWT ${localStorage.getItem("driver-token")}`,
+    },
+  };
   axios
-    .get(`${API_URL}/users/current-user/`, {
-      headers: {
-        Authorization: `JWT ${localStorage.getItem("driver-token")}`,
-      },
-    })
+    .get(`${API_URL}/users/current-user/`, header)
     .then((res) => {
       // Token not expired, set driver
       dispatch({

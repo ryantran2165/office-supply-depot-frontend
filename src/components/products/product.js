@@ -19,7 +19,7 @@ function Product() {
   const [quantity, setQuantity] = useState(1);
   const [cartID, setCartID] = useState(-1);
   const [similar, setSimilar] = useState([]);
-  const [notFound, setNotFound] = useState(false);
+  const [foundProduct, setFoundProduct] = useState(true);
   const history = useHistory();
   const signedIn = useSelector((state) => state.auth.signedIn);
 
@@ -32,7 +32,7 @@ function Product() {
         setQuantity(res.data.inventory === 0 ? 0 : 1);
       })
       .catch((err) => {
-        setNotFound(true);
+        setFoundProduct(false);
       });
 
     // Check if this product is in cart
@@ -105,10 +105,10 @@ function Product() {
 
   // Make sure product is not null before rendering
   if (product === null) {
-    if (notFound) {
+    if (!foundProduct) {
       return (
         <Container className="text-center py-5">
-          <h1>No Product Found!</h1>
+          <h1>Product not found</h1>
         </Container>
       );
     }
