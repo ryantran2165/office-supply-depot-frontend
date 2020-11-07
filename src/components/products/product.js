@@ -182,7 +182,7 @@ function Product() {
                   <Button
                     className="button-round"
                     onClick={() => handleOnClickQuantity(quantity - 1)}
-                    disabled={product.inventory === 0}
+                    disabled={product.inventory === 0 || cartID !== -1}
                   >
                     -
                   </Button>
@@ -191,12 +191,12 @@ function Product() {
                     type="text"
                     value={quantity}
                     onChange={handleOnChangeQuantity}
-                    disabled={product.inventory === 0}
+                    disabled={product.inventory === 0 || cartID !== -1}
                   />
                   <Button
                     className="button-round"
                     onClick={() => handleOnClickQuantity(quantity + 1)}
-                    disabled={product.inventory === 0}
+                    disabled={product.inventory === 0 || cartID !== -1}
                   >
                     +
                   </Button>
