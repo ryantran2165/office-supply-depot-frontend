@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { signOut } from "../../actions/auth-actions";
 import axios from "axios";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
@@ -22,6 +23,7 @@ function Product() {
   const [foundProduct, setFoundProduct] = useState(true);
   const history = useHistory();
   const signedIn = useSelector((state) => state.auth.signedIn);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     // Get product details from backend
@@ -36,21 +38,27 @@ function Product() {
       });
 
     // Check if this product is in cart
+    setCartID(-1);
     if (signedIn) {
       const header = {
         headers: {
           Authorization: `JWT ${localStorage.getItem("token")}`,
         },
       };
-      axios.get(`${API_URL}/carts/`, header).then((res) => {
-        const cart = res.data;
-        for (let item of cart) {
-          if (item.product === parseInt(id)) {
-            setCartID(item.id);
-            break;
+      axios
+        .get(`${API_URL}/carts/`, header)
+        .then((res) => {
+          const cart = res.data;
+          for (let item of cart) {
+            if (item.product === parseInt(id)) {
+              setCartID(item.id);
+              break;
+            }
           }
-        }
-      });
+        })
+        .catch((err) => {
+          tokenExpired();
+        });
     }
 
     // Get similar products
@@ -59,6 +67,7 @@ function Product() {
       .then((res) => {
         setSimilar(res.data);
       });
+    // eslint-disable-next-line
   }, [id, signedIn]);
 
   function handleOnClickQuantity(newQuantity) {
@@ -92,15 +101,30 @@ function Product() {
     // Does not have item, add to cart (POST)
     if (cartID === -1) {
       const data = { product: id, quantity: quantity };
-      axios.post(`${API_URL}/carts/`, data, header).then((res) => {
-        setCartID(res.data.id);
-      });
+      axios
+        .post(`${API_URL}/carts/`, data, header)
+        .then((res) => {
+          setCartID(res.data.id);
+        })
+        .catch((err) => {
+          tokenExpired();
+        });
     } else {
       // Has product in cart, remove from cart (DELETE)
-      axios.delete(`${API_URL}/carts/${cartID}`, header).then((res) => {
-        setCartID(-1);
-      });
+      axios
+        .delete(`${API_URL}/carts/${cartID}`, header)
+        .then((res) => {
+          setCartID(-1);
+        })
+        .catch((err) => {
+          tokenExpired();
+        });
     }
+  }
+
+  function tokenExpired() {
+    dispatch(signOut());
+    alert("Your token expired.\nPlease sign in again to use cart.");
   }
 
   // Make sure product is not null before rendering
