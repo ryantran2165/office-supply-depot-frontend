@@ -6,6 +6,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Image from "react-bootstrap/Image";
 import Button from "react-bootstrap/Button";
+import Dropdown from "react-bootstrap/Dropdown";
 
 function Cart() {
   const [cart, setCart] = useState(null);
@@ -45,7 +46,10 @@ function Cart() {
     );
   }
 
- 
+  const handleQuantity=(e)=>{
+    console.log(e);
+  }
+
   return (
     <Container className="py-3 d-flex">
       <Col>
@@ -54,47 +58,63 @@ function Cart() {
           return (
             <Container>
               <hr></hr>
-              <Row>
-                <Col></Col>
-                <Col><span className="bold-title">Item name</span></Col>
-                <Col><span className="bold-title">Price</span></Col>
-                <Col><span className="bold-title">Quantity</span></Col>
+              <Row xs="auto">
+                <Col className="col-2"></Col>
+                <Col className="col-3"><span className="bold-title">Item name</span></Col>
+                <Col className="col-2"><span className="bold-title">Price</span></Col>
+                <Col className="col-3"><span className="bold-title">Quantity</span></Col>
                 <Col><span className="bold-title">Subtotal</span></Col>
               </Row>
               <hr></hr>
-              <Row className=" r">
-                <Col>
+              <Row className="justify-content-center">
+                <Col className="col-2">
                   <Image rounded fluid src={item.product.img_url}></Image> 
                 </Col>
-                <Col>{item.product.name}</Col>
-                <Col>{item.product.price}</Col>
-                <Col>
-                  <Row>{item.quantity}</Row>
+                <Col className="col-3 ml-3">{item.product.name}</Col>
+                <Col className="col-2">{item.product.price}</Col>
+                <Col className="col-3">
+                  <Row className="ml-2">
+                    <Dropdown className="quantity-dropdown-menu">
+                      <Dropdown.Toggle className="quantity-button" id="quantity-dropdown" onSelect={handleQuantity}>{item.quantity}</Dropdown.Toggle>
+                      <Dropdown.Menu>
+                      <Dropdown.Item eventKey="option-1">1</Dropdown.Item>
+                        <Dropdown.Divider />
+                        <Dropdown.Item eventKey="option-2">2</Dropdown.Item>
+                        <Dropdown.Divider />
+                        <Dropdown.Item eventKey="option-3">3</Dropdown.Item>
+                        <Dropdown.Divider />
+                        <Dropdown.Item eventKey="option-2">4</Dropdown.Item>
+                        <Dropdown.Divider />
+                        <Dropdown.Item eventKey="option-2">5+</Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </Row>
+                  
                   <Row className="d-flex">
-                    <Button className="text-button">Remove</Button>
-                    <Button className="text-button vertical-divider">Save for later</Button>
+                    <Button className="d-flex text-button">Remove</Button>
+                    <Button className="d-flex text-button vertical-divider">Save for later</Button>
                   </Row>
                 </Col>
-                <Col>$$$</Col>
+                <Col className="ml-3">$$$</Col>
               </Row>
             </Container>
           );
         })}
         <Container>
           <hr></hr>
-          <h3>Saved items: </h3>
-          <Row className="d-flex justify-content-center">
-                <Col>
-                  <Image fluid src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg" className="cart-product-img"></Image>
+          <h3>Saved items: items</h3>
+          <Row className="d-flex mt-3">
+                <Col className="col-2">
+                  <Image rounded fluid src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg" className="cart-product-img"></Image>
                 </Col>
-                <Col>Price</Col>
-                <Col>
-                  <Row className="d-flex">
+                <Col className="col-8 ml-3">
+                  <Row className="ml-1"><span>Name</span></Row>
+                  <Row className="d-flex justify-content-start pl-2">
                     <Button className="text-button">Remove</Button>
-                    <Button className="text-button vertical-divider">Move to cart</Button>
+                    <Button className="text-button">Move to cart</Button>
                   </Row>
                 </Col>
-                <Col>$$$</Col>
+                <Col className="ml-3">$$$</Col>
               </Row>
         </Container>
       </Col>

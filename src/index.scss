@@ -163,7 +163,7 @@ body {
 }
 
 .cart-product-img {
-  width: 50%;
+  width: 100%;
 }
 
 .text-button {
@@ -175,5 +175,17 @@ body {
 
 .bold-title {
   font-weight: bold;
+}
+
+.quantity-button {
+  background: none !important;
+  border: none !important;
+  color: black !important;
+}
+
+.quantity-dropdown {
+  width: 100px !important;
+  flex: 1 !important;
+  float: left !important;
 }
 /* END CART */
