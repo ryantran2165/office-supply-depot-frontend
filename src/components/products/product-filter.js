@@ -18,6 +18,7 @@ function ProductFilter({
     <Accordion>
       <Card>
         <Accordion.Toggle
+          className="hover-pointer"
           as={Card.Header}
           eventKey={`${title}-accordion`}
           onClick={() => setIsOpen(!isOpen)}

@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { signOut } from "../../actions/auth-actions";
 import axios from "axios";
 import { API_URL } from "../../App";
 import Container from "react-bootstrap/Container";
@@ -6,10 +9,13 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Image from "react-bootstrap/Image";
 import Button from "react-bootstrap/Button";
-import Dropdown from "react-bootstrap/Dropdown";
+import Form from "react-bootstrap/Form";
 
+// TODO: Handle case of out of stock
+// TODO: Handle check out button
 function Cart() {
   const [cart, setCart] = useState(null);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     // Load cart data
@@ -18,19 +24,118 @@ function Cart() {
         Authorization: `JWT ${localStorage.getItem("token")}`,
       },
     };
-    axios.get(`${API_URL}/carts/`, header).then((res) => {
-      const cart = res.data;
-      setCart(cart);
+    axios
+      .get(`${API_URL}/carts/`, header)
+      .then((res) => {
+        const cart = [];
 
-      // Replace product ids with actual products
-      for (let item of cart) {
-        axios.get(`${API_URL}/products/${item.product}`).then((res) => {
-          item.product = res.data;
-          setCart([...cart]);
-        });
-      }
-    });
+        // To indicate that cart is loaded but empty
+        if (res.data.length === 0) {
+          setCart(cart);
+        }
+
+        // Replace product ids with actual products and add one at a time
+        for (let item of res.data) {
+          axios.get(`${API_URL}/products/${item.product}`).then((res) => {
+            item.product = res.data;
+            cart.push(item);
+            setCart([...cart]);
+          });
+        }
+      })
+      .catch(() => {
+        tokenExpired();
+      });
+    // eslint-disable-next-line
   }, []);
+
+  function calculateSubtotal(items) {
+    let totalDollars = 0;
+    let totalCents = 0;
+    for (let item of items) {
+      const [dollars, cents] = item.product.price.split(".");
+      totalDollars += parseInt(dollars) * item.quantity;
+      totalCents += parseInt(cents) * item.quantity;
+    }
+    const dollarsFromCents = Math.floor(totalCents / 100);
+    const remainingCents = totalCents % 100;
+    totalDollars += dollarsFromCents;
+    return `${totalDollars}.${remainingCents < 10 ? "0" : ""}${remainingCents}`;
+  }
+
+  function getQuantity(itemID) {
+    for (let item of cart) {
+      if (item.id === itemID) {
+        return item.quantity;
+      }
+    }
+    return -1;
+  }
+
+  function handleOnChangeQuantity(e, itemID) {
+    const cartCopy = [...cart];
+
+    for (let item of cartCopy) {
+      if (item.id === itemID) {
+        const re = /^\d{1,3}$/;
+        let newQuantity = parseInt(e.target.value);
+
+        if (re.test(newQuantity)) {
+          newQuantity = Math.max(newQuantity, 1);
+          newQuantity = Math.min(newQuantity, item.product.inventory);
+          item.quantity = newQuantity;
+
+          const header = {
+            headers: {
+              Authorization: `JWT ${localStorage.getItem("token")}`,
+            },
+          };
+
+          const data = {
+            quantity: newQuantity,
+          };
+
+          axios
+            .patch(`${API_URL}/carts/${itemID}/`, data, header)
+            .then((res) => {
+              setCart(cartCopy);
+            })
+            .catch((err) => {
+              tokenExpired();
+            });
+        }
+      }
+    }
+  }
+
+  function handleOnClickRemove(itemID) {
+    const header = {
+      headers: {
+        Authorization: `JWT ${localStorage.getItem("token")}`,
+      },
+    };
+
+    axios
+      .delete(`${API_URL}/carts/${itemID}`, header)
+      .then((res) => {
+        // Find the correct index to splice
+        for (let i = 0; i < cart.length; i++) {
+          if (cart[i].id === itemID) {
+            cart.splice(i, 1);
+            setCart([...cart]);
+            return;
+          }
+        }
+      })
+      .catch((err) => {
+        tokenExpired();
+      });
+  }
+
+  function tokenExpired() {
+    dispatch(signOut());
+    alert("Your token expired.\nPlease sign in again to use cart.");
+  }
 
   // Make sure cart is not null before rendering
   if (cart === null) {
@@ -40,130 +145,109 @@ function Cart() {
   // Empty cart
   if (cart.length === 0) {
     return (
-      <Container className="text-center py-3">
+      <Container className="text-center py-5">
         <h1>Cart is empty</h1>
       </Container>
     );
   }
 
-  const handleQuantity = (e) => {
-    console.log(e);
-  };
-
   return (
-    <Container className="py-3 d-flex">
-      <Col>
-        <h3>Your cart: items</h3>
-        {cart.map((item) => {
-          return (
-            <Container>
-              <hr></hr>
-              <Row xs="auto">
-                <Col className="col-2"></Col>
-                <Col className="col-3">
-                  <span className="bold-title">Item name</span>
-                </Col>
-                <Col className="col-2">
-                  <span className="bold-title">Price</span>
-                </Col>
-                <Col className="col-3">
-                  <span className="bold-title">Quantity</span>
+    <Container fluid className="pb-5 px-md-5">
+      <Row>
+        <Col className="py-3">
+          <Row>
+            <Col>
+              <h3>
+                Your cart: {cart.length} item{cart.length > 1 ? "s" : ""}
+              </h3>
+            </Col>
+          </Row>
+          <hr />
+          <Row>
+            <Col></Col>
+            <Col>
+              <h5>Product</h5>
+            </Col>
+            <Col>
+              <h5>Price</h5>
+            </Col>
+            <Col>
+              <h5>Quantity</h5>
+            </Col>
+            <Col>
+              <h5>Subtotal</h5>
+            </Col>
+          </Row>
+          <hr />
+          {cart.map((item) => {
+            return (
+              <Row className="mb-3" key={item.id}>
+                <Col>
+                  <Link to={`/products/${item.product.id}`}>
+                    <Image
+                      rounded
+                      fluid
+                      className="cart-img shadow"
+                      src={item.product.img_url}
+                    ></Image>
+                  </Link>
                 </Col>
                 <Col>
-                  <span className="bold-title">Subtotal</span>
+                  <Link
+                    className="link-hover-black"
+                    to={`/products/${item.product.id}`}
+                  >
+                    <h5>{item.product.name}</h5>
+                  </Link>
                 </Col>
-              </Row>
-              <hr></hr>
-              <Row className="justify-content-center">
-                <Col className="col-2">
-                  <Image rounded fluid src={item.product.img_url}></Image>
+                <Col>
+                  <h5>${item.product.price}</h5>
                 </Col>
-                <Col className="col-3 ml-3">{item.product.name}</Col>
-                <Col className="col-2">{item.product.price}</Col>
-                <Col className="col-3">
-                  <Row className="ml-2">
-                    <Dropdown className="quantity-dropdown-menu">
-                      <Dropdown.Toggle
-                        className="quantity-button"
-                        id="quantity-dropdown"
-                        onSelect={handleQuantity}
+                <Col>
+                  <Row>
+                    <Col>
+                      <Form.Control
+                        className="quantity-input"
+                        type="text"
+                        value={getQuantity(item.id)}
+                        onChange={(e) => handleOnChangeQuantity(e, item.id)}
+                      />
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col>
+                      <span
+                        className="hover-pointer"
+                        onClick={() => handleOnClickRemove(item.id)}
                       >
-                        {item.quantity}
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item eventKey="option-1">1</Dropdown.Item>
-                        <Dropdown.Divider />
-                        <Dropdown.Item eventKey="option-2">2</Dropdown.Item>
-                        <Dropdown.Divider />
-                        <Dropdown.Item eventKey="option-3">3</Dropdown.Item>
-                        <Dropdown.Divider />
-                        <Dropdown.Item eventKey="option-2">4</Dropdown.Item>
-                        <Dropdown.Divider />
-                        <Dropdown.Item eventKey="option-2">5+</Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </Row>
-
-                  <Row className="d-flex">
-                    <Button className="d-flex text-button">Remove</Button>
-                    <Button className="d-flex text-button vertical-divider">
-                      Save for later
-                    </Button>
+                        Remove
+                      </span>
+                    </Col>
                   </Row>
                 </Col>
-                <Col className="ml-3">$$$</Col>
+                <Col>
+                  <h5>${calculateSubtotal([item])}</h5>
+                </Col>
               </Row>
-            </Container>
-          );
-        })}
-        <Container>
-          <hr></hr>
-          <h3>Saved items: items</h3>
-          <Row className="d-flex mt-3">
-            <Col className="col-2">
-              <Image
-                rounded
-                fluid
-                src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"
-                className="cart-product-img"
-              ></Image>
+            );
+          })}
+        </Col>
+        <Col className="vertical-divider py-3" xs={12} lg={3}>
+          <Row className="mb-3">
+            <Col>
+              <h5>Subtotal</h5>
             </Col>
-            <Col className="col-8 ml-3">
-              <Row className="ml-1">
-                <span>Name</span>
-              </Row>
-              <Row className="d-flex justify-content-start pl-2">
-                <Button className="text-button">Remove</Button>
-                <Button className="text-button">Move to cart</Button>
-              </Row>
+            <Col className="text-right">
+              <h5>${calculateSubtotal(cart)}</h5>
             </Col>
-            <Col className="ml-3">$$$</Col>
           </Row>
-        </Container>
-      </Col>
-      <Col className="col-2 vertical-divider">
-        <Row>
-          <Col xs="auto">
-            <Row>
-              <Col>Subtotal</Col>
-            </Row>
-            <Row>
-              <Col>Delivery</Col>
-            </Row>
-          </Col>
-          <Col>
-            <Row>
-              <Col>$$$</Col>
-            </Row>
-            <Row>
-              <Col>$$$</Col>
-            </Row>
-          </Col>
-        </Row>
-        <Row className="col text-center my-2">
-          <Button className="button-oval">Check out</Button>
-        </Row>
-      </Col>
+          <Row>
+            <Col>
+              <Button className="button-oval w-100">Check out</Button>
+            </Col>
+          </Row>
+        </Col>
+      </Row>
     </Container>
   );
 }
