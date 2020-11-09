@@ -46,9 +46,9 @@ function Cart() {
     );
   }
 
-  const handleQuantity=(e)=>{
+  const handleQuantity = (e) => {
     console.log(e);
-  }
+  };
 
   return (
     <Container className="py-3 d-flex">
@@ -60,24 +60,38 @@ function Cart() {
               <hr></hr>
               <Row xs="auto">
                 <Col className="col-2"></Col>
-                <Col className="col-3"><span className="bold-title">Item name</span></Col>
-                <Col className="col-2"><span className="bold-title">Price</span></Col>
-                <Col className="col-3"><span className="bold-title">Quantity</span></Col>
-                <Col><span className="bold-title">Subtotal</span></Col>
+                <Col className="col-3">
+                  <span className="bold-title">Item name</span>
+                </Col>
+                <Col className="col-2">
+                  <span className="bold-title">Price</span>
+                </Col>
+                <Col className="col-3">
+                  <span className="bold-title">Quantity</span>
+                </Col>
+                <Col>
+                  <span className="bold-title">Subtotal</span>
+                </Col>
               </Row>
               <hr></hr>
               <Row className="justify-content-center">
                 <Col className="col-2">
-                  <Image rounded fluid src={item.product.img_url}></Image> 
+                  <Image rounded fluid src={item.product.img_url}></Image>
                 </Col>
                 <Col className="col-3 ml-3">{item.product.name}</Col>
                 <Col className="col-2">{item.product.price}</Col>
                 <Col className="col-3">
                   <Row className="ml-2">
                     <Dropdown className="quantity-dropdown-menu">
-                      <Dropdown.Toggle className="quantity-button" id="quantity-dropdown" onSelect={handleQuantity}>{item.quantity}</Dropdown.Toggle>
+                      <Dropdown.Toggle
+                        className="quantity-button"
+                        id="quantity-dropdown"
+                        onSelect={handleQuantity}
+                      >
+                        {item.quantity}
+                      </Dropdown.Toggle>
                       <Dropdown.Menu>
-                      <Dropdown.Item eventKey="option-1">1</Dropdown.Item>
+                        <Dropdown.Item eventKey="option-1">1</Dropdown.Item>
                         <Dropdown.Divider />
                         <Dropdown.Item eventKey="option-2">2</Dropdown.Item>
                         <Dropdown.Divider />
@@ -89,10 +103,12 @@ function Cart() {
                       </Dropdown.Menu>
                     </Dropdown>
                   </Row>
-                  
+
                   <Row className="d-flex">
                     <Button className="d-flex text-button">Remove</Button>
-                    <Button className="d-flex text-button vertical-divider">Save for later</Button>
+                    <Button className="d-flex text-button vertical-divider">
+                      Save for later
+                    </Button>
                   </Row>
                 </Col>
                 <Col className="ml-3">$$$</Col>
@@ -104,18 +120,25 @@ function Cart() {
           <hr></hr>
           <h3>Saved items: items</h3>
           <Row className="d-flex mt-3">
-                <Col className="col-2">
-                  <Image rounded fluid src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg" className="cart-product-img"></Image>
-                </Col>
-                <Col className="col-8 ml-3">
-                  <Row className="ml-1"><span>Name</span></Row>
-                  <Row className="d-flex justify-content-start pl-2">
-                    <Button className="text-button">Remove</Button>
-                    <Button className="text-button">Move to cart</Button>
-                  </Row>
-                </Col>
-                <Col className="ml-3">$$$</Col>
+            <Col className="col-2">
+              <Image
+                rounded
+                fluid
+                src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"
+                className="cart-product-img"
+              ></Image>
+            </Col>
+            <Col className="col-8 ml-3">
+              <Row className="ml-1">
+                <span>Name</span>
               </Row>
+              <Row className="d-flex justify-content-start pl-2">
+                <Button className="text-button">Remove</Button>
+                <Button className="text-button">Move to cart</Button>
+              </Row>
+            </Col>
+            <Col className="ml-3">$$$</Col>
+          </Row>
         </Container>
       </Col>
       <Col className="col-2 vertical-divider">

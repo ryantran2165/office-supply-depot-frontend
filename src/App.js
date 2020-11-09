@@ -114,6 +114,7 @@ const mapStateToProps = (state) => ({
   driverSignedIn: state.auth.driverSignedIn,
 });
 
-export default connect(mapStateToProps, { checkSignedIn, checkDriverSignedIn })(
-  App
-);
+export default connect(mapStateToProps, {
+  checkSignedIn,
+  checkDriverSignedIn,
+})(App);

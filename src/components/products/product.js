@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { signOut } from "../../actions/auth-actions";
 import axios from "axios";
-import { API_URL } from "../../App";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -10,6 +10,7 @@ import Image from "react-bootstrap/Image";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import ProductBox from "./product-box";
+import { API_URL } from "../../App";
 
 const NUM_SIMILAR = 4;
 
@@ -19,9 +20,10 @@ function Product() {
   const [quantity, setQuantity] = useState(1);
   const [cartID, setCartID] = useState(-1);
   const [similar, setSimilar] = useState([]);
-  const [notFound, setNotFound] = useState(false);
+  const [foundProduct, setFoundProduct] = useState(true);
   const history = useHistory();
   const signedIn = useSelector((state) => state.auth.signedIn);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     // Get product details from backend
@@ -32,25 +34,31 @@ function Product() {
         setQuantity(res.data.inventory === 0 ? 0 : 1);
       })
       .catch((err) => {
-        setNotFound(true);
+        setFoundProduct(false);
       });
 
     // Check if this product is in cart
+    setCartID(-1);
     if (signedIn) {
       const header = {
         headers: {
           Authorization: `JWT ${localStorage.getItem("token")}`,
         },
       };
-      axios.get(`${API_URL}/carts/`, header).then((res) => {
-        const cart = res.data;
-        for (let item of cart) {
-          if (item.product === parseInt(id)) {
-            setCartID(item.id);
-            break;
+      axios
+        .get(`${API_URL}/carts/`, header)
+        .then((res) => {
+          const cart = res.data;
+          for (let item of cart) {
+            if (item.product === parseInt(id)) {
+              setCartID(item.id);
+              break;
+            }
           }
-        }
-      });
+        })
+        .catch((err) => {
+          tokenExpired();
+        });
     }
 
     // Get similar products
@@ -59,23 +67,20 @@ function Product() {
       .then((res) => {
         setSimilar(res.data);
       });
+    // eslint-disable-next-line
   }, [id, signedIn]);
 
   function handleOnClickQuantity(newQuantity) {
-    // Clamp quantity [1, product.inventory]
-    if (newQuantity < 1) {
-      newQuantity = 1;
-    } else if (newQuantity > product.inventory) {
-      newQuantity = product.inventory;
-    }
+    newQuantity = Math.max(newQuantity, 1);
+    newQuantity = Math.min(newQuantity, product.inventory);
     setQuantity(newQuantity);
   }
 
   function handleOnChangeQuantity(e) {
     const re = /^\d{1,3}$/;
     const newQuantity = parseInt(e.target.value);
+
     if (re.test(newQuantity)) {
-      // Clamps and sets new quantity
       handleOnClickQuantity(newQuantity);
     }
   }
@@ -96,23 +101,38 @@ function Product() {
     // Does not have item, add to cart (POST)
     if (cartID === -1) {
       const data = { product: id, quantity: quantity };
-      axios.post(`${API_URL}/carts/`, data, header).then((res) => {
-        setCartID(res.data.id);
-      });
+      axios
+        .post(`${API_URL}/carts/`, data, header)
+        .then((res) => {
+          setCartID(res.data.id);
+        })
+        .catch((err) => {
+          tokenExpired();
+        });
     } else {
       // Has product in cart, remove from cart (DELETE)
-      axios.delete(`${API_URL}/carts/${cartID}`, header).then((res) => {
-        setCartID(-1);
-      });
+      axios
+        .delete(`${API_URL}/carts/${cartID}`, header)
+        .then((res) => {
+          setCartID(-1);
+        })
+        .catch((err) => {
+          tokenExpired();
+        });
     }
+  }
+
+  function tokenExpired() {
+    dispatch(signOut());
+    alert("Your token expired.\nPlease sign in again to use cart.");
   }
 
   // Make sure product is not null before rendering
   if (product === null) {
-    if (notFound) {
+    if (!foundProduct) {
       return (
-        <Container className="py-5 text-center">
-          <h1>No Product Found!</h1>
+        <Container className="text-center py-5">
+          <h1>Product not found</h1>
         </Container>
       );
     }
@@ -122,12 +142,12 @@ function Product() {
   return (
     <Container fluid className="py-5 px-md-5">
       <Row className="justify-content-center">
-        <Col xs={12} md={6} className="mb-3">
+        <Col className="mb-3" xs={12} md={6}>
           <Image
             fluid
             rounded
-            src={product.img_url}
             className="product-img shadow"
+            src={product.img_url}
           />
         </Col>
         <Col xs={12} md={6}>
@@ -162,21 +182,21 @@ function Product() {
                   <Button
                     className="button-round"
                     onClick={() => handleOnClickQuantity(quantity - 1)}
-                    disabled={product.inventory === 0}
+                    disabled={product.inventory === 0 || cartID !== -1}
                   >
                     -
                   </Button>
                   <Form.Control
+                    className="quantity-input mx-3"
                     type="text"
                     value={quantity}
-                    className="quantity-input mx-3"
                     onChange={handleOnChangeQuantity}
-                    disabled={product.inventory === 0}
+                    disabled={product.inventory === 0 || cartID !== -1}
                   />
                   <Button
                     className="button-round"
                     onClick={() => handleOnClickQuantity(quantity + 1)}
-                    disabled={product.inventory === 0}
+                    disabled={product.inventory === 0 || cartID !== -1}
                   >
                     +
                   </Button>
