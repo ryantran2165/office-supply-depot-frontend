@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { signOut } from "../../actions/auth-actions";
 import axios from "axios";
@@ -14,6 +14,7 @@ import Form from "react-bootstrap/Form";
 function Cart() {
   const [cart, setCart] = useState(null);
   const dispatch = useDispatch();
+  const history = useHistory();
 
   useEffect(() => {
     loadCart();
@@ -162,6 +163,7 @@ function Cart() {
           return;
         } else if (i === cart.length - 1) {
           // All quantities valid, change page to checkout
+          history.push("/checkout");
         }
       });
     }

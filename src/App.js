@@ -12,6 +12,7 @@ import Signin from "./components/account/signin";
 import Signup from "./components/account/signup";
 import Account from "./components/account/account";
 import Cart from "./components/cart/cart";
+import Checkout from "./components/checkout/checkout";
 import DriverSignIn from "./components/driver/driver-signin";
 import DriverNavigation from "./components/driver/driver-navigation";
 import Driver from "./components/driver/driver";
@@ -70,6 +71,14 @@ class App extends Component {
           <RestrictedRoute
             path="/cart"
             component={Cart}
+            allowSignedIn={true}
+            redirect="/signin"
+            signedIn={this.props.signedIn}
+            navigation={Navigation}
+          />
+          <RestrictedRoute
+            path="/checkout"
+            component={Checkout}
             allowSignedIn={true}
             redirect="/signin"
             signedIn={this.props.signedIn}
