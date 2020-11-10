@@ -263,6 +263,12 @@ class Products extends Component {
     }
   };
 
+  handleOnClickClear = () => {
+    this.props.setCategory("");
+    this.props.setSubcategory("");
+    this.handleOnClickPrice("");
+  };
+
   handleOnClickCategory = (category) => {
     if (category === this.props.category) {
       category = "";
@@ -328,6 +334,16 @@ class Products extends Component {
         </Row>
         <Row>
           <Col className="mb-3" xs={12} md="auto">
+            <Row className="mb-2">
+              <Col>
+                <span
+                  className="hover-pointer font-weight-bold"
+                  onClick={this.handleOnClickClear}
+                >
+                  Clear filters
+                </span>
+              </Col>
+            </Row>
             <ProductFilter
               title="Category"
               activeKey={this.props.category}
