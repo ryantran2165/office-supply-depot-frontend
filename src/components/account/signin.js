@@ -10,7 +10,7 @@ import Image from "react-bootstrap/Image";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 
-class SignIn extends Component {
+class Signin extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -82,7 +82,7 @@ class SignIn extends Component {
             <h6 className="text-center mt-3">Don't have an account?</h6>
             <Row className="account-button-container">
               <Col className="text-center">
-                <Link to="/sign-up">
+                <Link to="/signup">
                   <Button className="button-oval button-orange w-100">
                     Sign Up
                   </Button>
@@ -96,8 +96,8 @@ class SignIn extends Component {
   }
 }
 
-SignIn.propTypes = {
+Signin.propTypes = {
   signIn: PropTypes.func,
 };
 
-export default connect(null, { signIn })(SignIn);
+export default connect(null, { signIn })(Signin);

@@ -20,7 +20,8 @@ function Product() {
   const [quantity, setQuantity] = useState(1);
   const [cartID, setCartID] = useState(-1);
   const [similar, setSimilar] = useState([]);
-  const [foundProduct, setFoundProduct] = useState(true);
+  const [isFoundProduct, setIsFoundProduct] = useState(true);
+  const [isCartButtonDisabled, setIsCartButtonDisabled] = useState(false);
   const history = useHistory();
   const signedIn = useSelector((state) => state.auth.signedIn);
   const dispatch = useDispatch();
@@ -32,63 +33,74 @@ function Product() {
       .then((res) => {
         setProduct(res.data);
         setQuantity(res.data.inventory === 0 ? 0 : 1);
+        setCartID(-1);
+
+        // This is nested because order of setQuantity
+        if (signedIn) {
+          const header = {
+            headers: {
+              Authorization: `JWT ${localStorage.getItem("token")}`,
+            },
+          };
+
+          // Check if this product is in cart
+          axios
+            .get(`${API_URL}/carts/`, header)
+            .then((res) => {
+              for (let item of res.data) {
+                // id is a String because it comes from url params
+                if (item.product === parseInt(id)) {
+                  setCartID(item.id);
+                  setQuantity(item.quantity);
+                  return;
+                }
+              }
+            })
+            .catch((err) => {
+              tokenExpired();
+            });
+        }
+
+        // Get similar products
+        axios
+          .get(
+            `${API_URL}/products/list_similar/?id=${id}&items=${NUM_SIMILAR}`
+          )
+          .then((res) => {
+            setSimilar(res.data);
+          });
       })
       .catch((err) => {
-        setFoundProduct(false);
-      });
-
-    // Check if this product is in cart
-    setCartID(-1);
-    if (signedIn) {
-      const header = {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem("token")}`,
-        },
-      };
-      axios
-        .get(`${API_URL}/carts/`, header)
-        .then((res) => {
-          const cart = res.data;
-          for (let item of cart) {
-            if (item.product === parseInt(id)) {
-              setCartID(item.id);
-              break;
-            }
-          }
-        })
-        .catch((err) => {
-          tokenExpired();
-        });
-    }
-
-    // Get similar products
-    axios
-      .get(`${API_URL}/products/list_similar/?id=${id}&items=${NUM_SIMILAR}`)
-      .then((res) => {
-        setSimilar(res.data);
+        setIsFoundProduct(false);
       });
     // eslint-disable-next-line
   }, [id, signedIn]);
 
-  function handleOnClickQuantity(newQuantity) {
-    newQuantity = Math.max(newQuantity, 1);
-    newQuantity = Math.min(newQuantity, product.inventory);
-    setQuantity(newQuantity);
+  function handleOnClickQuantity(quantity) {
+    quantity = Math.max(quantity, 1);
+    quantity = Math.min(quantity, product.inventory);
+    setQuantity(quantity);
   }
 
   function handleOnChangeQuantity(e) {
     const re = /^\d{1,3}$/;
-    const newQuantity = parseInt(e.target.value);
+    const quantity = parseInt(e.target.value);
 
-    if (re.test(newQuantity)) {
-      handleOnClickQuantity(newQuantity);
+    if (re.test(quantity)) {
+      handleOnClickQuantity(quantity);
     }
   }
 
   function handleOnClickCart() {
+    // Prevent multiple clicks before backend processing is finished
+    if (isCartButtonDisabled) {
+      return;
+    }
+    setIsCartButtonDisabled(true);
+
     // Must sign in to add to cart
     if (!signedIn) {
-      history.push("/sign-in");
+      history.push("/signin");
       return;
     }
 
@@ -100,23 +112,43 @@ function Product() {
 
     // Does not have item, add to cart (POST)
     if (cartID === -1) {
-      const data = { product: id, quantity: quantity };
-      axios
-        .post(`${API_URL}/carts/`, data, header)
-        .then((res) => {
-          setCartID(res.data.id);
-        })
-        .catch((err) => {
-          tokenExpired();
-        });
+      // Check if inventory has changed
+      axios.get(`${API_URL}/products/${id}`).then((res) => {
+        // Has enough inventory
+        if (quantity <= res.data.inventory) {
+          const data = { product: id, quantity: quantity };
+
+          axios
+            .post(`${API_URL}/carts/`, data, header)
+            .then((res) => {
+              setCartID(res.data.id);
+              setIsCartButtonDisabled(false);
+            })
+            .catch((err) => {
+              setIsCartButtonDisabled(false);
+              tokenExpired();
+            });
+        } else {
+          // Not enough inventory, update the page
+          setProduct(res.data);
+          setQuantity(res.data.inventory === 0 ? 0 : 1);
+          setIsCartButtonDisabled(false);
+          alert(
+            "The product's inventory has changed.\nPlease choose a new quantity."
+          );
+        }
+      });
     } else {
       // Has product in cart, remove from cart (DELETE)
       axios
         .delete(`${API_URL}/carts/${cartID}`, header)
         .then((res) => {
           setCartID(-1);
+          setQuantity(product.inventory === 0 ? 0 : 1);
+          setIsCartButtonDisabled(false);
         })
         .catch((err) => {
+          setIsCartButtonDisabled(false);
           tokenExpired();
         });
     }
@@ -129,7 +161,7 @@ function Product() {
 
   // Make sure product is not null before rendering
   if (product === null) {
-    if (!foundProduct) {
+    if (!isFoundProduct) {
       return (
         <Container className="text-center py-5">
           <h1>Product not found</h1>
@@ -208,7 +240,9 @@ function Product() {
             className="add-to-cart-button mt-3"
             value="Add to cart"
             onClick={handleOnClickCart}
-            disabled={product.inventory === 0 && cartID === -1} // Always allow remove from cart
+            disabled={
+              isCartButtonDisabled || (product.inventory === 0 && cartID === -1)
+            } // Always allow remove from cart
           >
             {cartID === -1 ? "Add to cart" : "Remove from cart"}
           </Button>

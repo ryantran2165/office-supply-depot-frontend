@@ -8,11 +8,11 @@ import Navigation from "./components/navigation/navigation";
 import Home from "./components/home/home";
 import Products from "./components/products/products";
 import Product from "./components/products/product";
-import SignIn from "./components/account/sign-in";
-import SignUp from "./components/account/sign-up";
+import Signin from "./components/account/signin";
+import Signup from "./components/account/signup";
 import Account from "./components/account/account";
 import Cart from "./components/cart/cart";
-import DriverSignIn from "./components/driver/driver-sign-in";
+import DriverSignIn from "./components/driver/driver-signin";
 import DriverNavigation from "./components/driver/driver-navigation";
 import Driver from "./components/driver/driver";
 
@@ -44,18 +44,18 @@ class App extends Component {
             </React.Fragment>
           </Route>
           <RestrictedRoute
-            path="/sign-in"
-            component={SignIn}
+            path="/signin"
+            component={Signin}
             allowSignedIn={false}
-            redirect="/account"
+            redirect="/"
             signedIn={this.props.signedIn}
             navigation={Navigation}
           />
           <RestrictedRoute
-            path="/sign-up"
-            component={SignUp}
+            path="/signup"
+            component={Signup}
             allowSignedIn={false}
-            redirect="/account"
+            redirect="/"
             signedIn={this.props.signedIn}
             navigation={Navigation}
           />
@@ -63,7 +63,7 @@ class App extends Component {
             path="/account"
             component={Account}
             allowSignedIn={true}
-            redirect="/sign-in"
+            redirect="/signin"
             signedIn={this.props.signedIn}
             navigation={Navigation}
           />
@@ -71,12 +71,12 @@ class App extends Component {
             path="/cart"
             component={Cart}
             allowSignedIn={true}
-            redirect="/sign-in"
+            redirect="/signin"
             signedIn={this.props.signedIn}
             navigation={Navigation}
           />
           <RestrictedRoute
-            path="/driver-sign-in"
+            path="/driver-signin"
             component={DriverSignIn}
             allowSignedIn={false}
             redirect="/driver"
@@ -86,7 +86,7 @@ class App extends Component {
             path="/driver"
             component={Driver}
             allowSignedIn={true}
-            redirect="/driver-sign-in"
+            redirect="/driver-signin"
             signedIn={this.props.driverSignedIn}
             navigation={DriverNavigation}
           />

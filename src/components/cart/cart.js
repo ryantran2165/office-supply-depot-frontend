@@ -11,14 +11,16 @@ import Image from "react-bootstrap/Image";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 
-// TODO: Handle case of out of stock
-// TODO: Handle check out button
 function Cart() {
   const [cart, setCart] = useState(null);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // Load cart data
+    loadCart();
+    // eslint-disable-next-line
+  }, []);
+
+  function loadCart() {
     const header = {
       headers: {
         Authorization: `JWT ${localStorage.getItem("token")}`,
@@ -46,8 +48,7 @@ function Cart() {
       .catch(() => {
         tokenExpired();
       });
-    // eslint-disable-next-line
-  }, []);
+  }
 
   function calculateSubtotal(items) {
     let totalDollars = 0;
@@ -63,52 +64,66 @@ function Cart() {
     return `${totalDollars}.${remainingCents < 10 ? "0" : ""}${remainingCents}`;
   }
 
-  function getQuantity(itemID) {
-    for (let item of cart) {
-      if (item.id === itemID) {
-        return item.quantity;
-      }
+  function handleOnChangeQuantity(e, item) {
+    const re = /^\d{1,3}$/;
+    let quantity = parseInt(e.target.value);
+
+    // Failed regex: 1 to 3 digit number
+    if (!re.test(quantity)) {
+      return;
     }
-    return -1;
+
+    // Clamp
+    quantity = Math.max(quantity, 1);
+    quantity = Math.min(quantity, item.product.inventory);
+
+    // Check if inventory has changed
+    axios.get(`${API_URL}/products/${item.product.id}`).then((res) => {
+      // Has enough inventory
+      if (quantity <= res.data.inventory) {
+        const header = {
+          headers: {
+            Authorization: `JWT ${localStorage.getItem("token")}`,
+          },
+        };
+        const data = {
+          quantity: quantity,
+        };
+
+        axios
+          .patch(`${API_URL}/carts/${item.id}/`, data, header)
+          .then((res) => {
+            const cartCopy = [...cart];
+
+            // Set new quantity on corresponding item of cart copy
+            for (let itemCopy of cartCopy) {
+              if (itemCopy.id === item.id) {
+                itemCopy.quantity = quantity;
+              }
+            }
+
+            setCart(cartCopy);
+          })
+          .catch((err) => {
+            tokenExpired();
+          });
+      } else {
+        // Not enough inventory, reload cart
+        loadCart();
+        alert(
+          "The product's inventory has changed.\nPlease choose a new quantity."
+        );
+      }
+    });
   }
 
-  function handleOnChangeQuantity(e, itemID) {
-    const cartCopy = [...cart];
-
-    for (let item of cartCopy) {
-      if (item.id === itemID) {
-        const re = /^\d{1,3}$/;
-        let newQuantity = parseInt(e.target.value);
-
-        if (re.test(newQuantity)) {
-          newQuantity = Math.max(newQuantity, 1);
-          newQuantity = Math.min(newQuantity, item.product.inventory);
-          item.quantity = newQuantity;
-
-          const header = {
-            headers: {
-              Authorization: `JWT ${localStorage.getItem("token")}`,
-            },
-          };
-
-          const data = {
-            quantity: newQuantity,
-          };
-
-          axios
-            .patch(`${API_URL}/carts/${itemID}/`, data, header)
-            .then((res) => {
-              setCart(cartCopy);
-            })
-            .catch((err) => {
-              tokenExpired();
-            });
-        }
-      }
+  function handleOnClickRemove(e, itemID) {
+    // Prevent multiple clicks
+    if (e.target.disabled) {
+      return;
     }
-  }
+    e.target.disabled = true;
 
-  function handleOnClickRemove(itemID) {
     const header = {
       headers: {
         Authorization: `JWT ${localStorage.getItem("token")}`,
@@ -130,6 +145,26 @@ function Cart() {
       .catch((err) => {
         tokenExpired();
       });
+  }
+
+  function handleOnClickCheckout() {
+    // Check all quantities are <= the available stock
+    for (let i = 0; i < cart.length; i++) {
+      const item = cart[i];
+
+      axios.get(`${API_URL}/products/${item.product.id}`).then((res) => {
+        // Not enough inventory
+        if (item.quantity > res.data.inventory) {
+          loadCart();
+          alert(
+            "Some products' inventories have changed.\nPlease reduce quantities that are greater than the available stock or remove the product."
+          );
+          return;
+        } else if (i === cart.length - 1) {
+          // All quantities valid, change page to checkout
+        }
+      });
+    }
   }
 
   function tokenExpired() {
@@ -209,16 +244,20 @@ function Cart() {
                       <Form.Control
                         className="quantity-input"
                         type="text"
-                        value={getQuantity(item.id)}
-                        onChange={(e) => handleOnChangeQuantity(e, item.id)}
+                        value={item.quantity}
+                        onChange={(e) => handleOnChangeQuantity(e, item)}
+                        disabled={item.product.inventory === 0}
                       />
                     </Col>
                   </Row>
                   <Row>
+                    <Col>{item.product.inventory} in stock</Col>
+                  </Row>
+                  <Row>
                     <Col>
                       <span
-                        className="hover-pointer"
-                        onClick={() => handleOnClickRemove(item.id)}
+                        className="hover-pointer font-weight-bold"
+                        onClick={(e) => handleOnClickRemove(e, item.id)}
                       >
                         Remove
                       </span>
@@ -243,7 +282,12 @@ function Cart() {
           </Row>
           <Row>
             <Col>
-              <Button className="button-oval w-100">Check out</Button>
+              <Button
+                className="button-oval w-100"
+                onClick={handleOnClickCheckout}
+              >
+                Check out
+              </Button>
             </Col>
           </Row>
         </Col>

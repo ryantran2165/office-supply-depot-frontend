@@ -23,7 +23,7 @@ class DriverNavigation extends Component {
             <Nav.Item>
               <Link
                 className="nav-link"
-                to="/driver-sign-in"
+                to="/driver-signin"
                 onClick={this.props.driverSignOut}
               >
                 Sign out

@@ -105,7 +105,16 @@ class Navigation extends Component {
               {/*Dropdown for non-mobile only*/}
               <Dropdown className="d-none d-md-block">
                 <Dropdown.Toggle id="search-dropdown" />
-                <Dropdown.Menu>{this.getNavDropdowns()}</Dropdown.Menu>
+                <Dropdown.Menu>
+                  <NavDropdown.Item
+                    className="no-submenu-navdropdown-item"
+                    onClick={() => this.handleNavOnClick("", "")}
+                  >
+                    All Products
+                  </NavDropdown.Item>
+                  <Dropdown.Divider />
+                  {this.getNavDropdowns()}
+                </Dropdown.Menu>
               </Dropdown>
               <FormControl
                 type="text"
@@ -121,6 +130,13 @@ class Navigation extends Component {
             </Form>
             {/*Dropdown for mobile only*/}
             <NavDropdown className="d-md-none" title="Products">
+              <NavDropdown.Item
+                className="no-submenu-navdropdown-item"
+                onClick={() => this.handleNavOnClick("", "")}
+              >
+                All Products
+              </NavDropdown.Item>
+              <Dropdown.Divider />
               {this.getNavDropdowns()}
             </NavDropdown>
           </Nav>
@@ -131,7 +147,7 @@ class Navigation extends Component {
                   Hi {this.props.user.first_name}
                 </Link>
               ) : (
-                <Link className="nav-link" to="/sign-in">
+                <Link className="nav-link" to="/signin">
                   Account
                 </Link>
               )}
