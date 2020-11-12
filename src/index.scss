@@ -220,14 +220,6 @@ body {
   color: grey;
 }
 
-.left-form {
-  width: 250px !important;
-}
-
-.right-form {
-  width: 500px !important;
-}
-
 .shipping-form {
   padding: 15px 30px 30px 30px;
 }
@@ -253,8 +245,26 @@ body {
   border-bottom: solid 1px;
 }
 
+.credit-form {
+  padding: 12px 12px 0px 12px;
+}
+
+.paypal-form {
+  text-align: center;
+  width: 500px;
+  height: 175px;
+  vertical-align: middle;
+}
+
 .checkout-img {
   width: 40%;
+}
+
+.payment-option {
+  background: white !important;
+  border: solid black 1px !important;
+  color: black !important;
+  font-weight: bold !important;
 }
 
 .item-quantity {
@@ -267,17 +277,4 @@ body {
   border-radius: 50%;
   color: white;
 }
-
-.credit-form {
-  padding: 12px 12px 0px 12px;
-}
-
-.paypal-form {
-  text-align: center;
-  width: 500px;
-  height: 175px;
-  vertical-align: middle;
-}
-
-
 /* END CHECKOUT */

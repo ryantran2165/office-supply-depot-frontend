@@ -182,9 +182,9 @@ class Checkout extends Component {
           <Row className="checkout-padding-left py-3">
             <h5>Payment method</h5>
           </Row>
-          <Row className="checkout-padding-left pb-3">
-            <Button className="p-2" onClick={() => this.setState({ payment_type: "credit" })}>Credit card</Button>
-            <Button className="ml-3 px-3 py-2" onClick={() => this.setState({ payment_type: "paypal" })}>Paypal</Button>
+          <Row className="checkout-padding-left pb-4">
+            <Button className="p-2 payment-option" onClick={() => this.setState({ payment_type: "credit" })}>Credit card</Button>
+            <Button className="ml-3 px-3 py-2 payment-option" onClick={() => this.setState({ payment_type: "paypal" })}>Paypal</Button>
           </Row>
           <Row className="checkout-padding-left" style={{ display: (payment_type == "credit" ? 'block' : 'none') }}>
             <Form className="payment-form credit-form">
