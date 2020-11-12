@@ -213,3 +213,58 @@ body {
 }
 
 /* END CART */
+
+/* CHECKOUT */
+.grey-text {
+  font-size: 15px;
+  color: grey;
+}
+
+.left-form {
+  width: 250px !important;
+}
+
+.right-form {
+  width: 500px !important;
+}
+
+.shipping-form {
+  padding: 15px 30px 30px 30px;
+}
+
+.checkout-padding-left {
+  padding-left: 125px;
+}
+
+.checkout-padding-right {
+  padding-right: 125px;
+}
+
+.hr-width {
+  width: 70%;
+  margin-left: 50px;
+}
+
+.payment-form {
+  width: 450px;
+  background-color: #f0f0f0;
+  border-top: solid 1px;
+  border-bottom: solid 1px;
+  padding: 12px 12px 0px 12px;
+}
+
+.checkout-img {
+  width: 40%;
+}
+
+.item-quantity {
+  position: relative;
+  top: -35px;
+  left: -12px;
+  background: #0e3ab2;
+  font-size: 12px;
+  padding: 2px 7px;
+  border-radius: 50%;
+  color: white;
+}
+/* END CHECKOUT */
