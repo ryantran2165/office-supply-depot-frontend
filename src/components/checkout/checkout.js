@@ -10,6 +10,7 @@ import Col from "react-bootstrap/Col";
 import Image from "react-bootstrap/Image";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
+import Card from "react-bootstrap/Card"
 import { FormControl, FormGroup, FormLabel } from "react-bootstrap";
 
 class Checkout extends Component {
@@ -17,6 +18,7 @@ class Checkout extends Component {
     super(props);
     this.state = {
       cart: null,
+      payment_type: null,
     };
   }
 
@@ -74,7 +76,9 @@ class Checkout extends Component {
       this.props.history.push("/cart");
     }
 
+    const {payment_type} = this.state;
     return (
+      
       <Container fluid className="d-flex px-md-5 py-3">
         <Col xs={7}>
           <Row className="checkout-padding-left">
@@ -170,7 +174,7 @@ class Checkout extends Component {
                 <Form.Check
                   type="radio"
                   label="Delivery"
-                  name="pickup"
+                  name="delivery"
                 />
               </FormGroup>
             </fieldset>
@@ -178,45 +182,55 @@ class Checkout extends Component {
           <Row className="checkout-padding-left py-3">
             <h5>Payment method</h5>
           </Row>
-          <Row className="checkout-padding-left">
-            <Form className="payment-form">
-              <FormGroup>
-              <Form.Control 
-                  required
-                  type="text"
-                  name="card_number"
-                  placeholder="Card number"
-                />
-              </FormGroup>
-              <FormGroup>
-              <Form.Control
-                      required
-                      type="text"
-                      name="name_on_card"
-                      placeholder="Name on card"
-                    />
-              </FormGroup>
-              <Form.Row>
-                  <FormGroup as={Col}>
-                    <Form.Control
-                      required
-                      type="text"
-                      name="exp_date"
-                      placeholder="Expiration date (MM/YY)"
-                    />
-                  </FormGroup>
-                  <FormGroup as={Col}>
-                    <Form.Control
-                      required
-                      type="text"
-                      name="security_code"
-                      placeholder="Security code"
-                    />
-                  </FormGroup>
-                </Form.Row>
+          <Row className="checkout-padding-left pb-3">
+            <Button className="p-2" onClick={() => this.setState({ payment_type: "credit" })}>Credit card</Button>
+            <Button className="ml-3 px-3 py-2" onClick={() => this.setState({ payment_type: "paypal" })}>Paypal</Button>
+          </Row>
+          <Row className="checkout-padding-left" style={{ display: (payment_type == "credit" ? 'block' : 'none') }}>
+            <Form className="payment-form credit-form">
+            <FormGroup>
+            <Form.Control 
+                required
+                type="text"
+                name="card_number"
+                placeholder="Card number"
+              />
+            </FormGroup>
+            <FormGroup>
+            <Form.Control
+                    required
+                    type="text"
+                    name="name_on_card"
+                    placeholder="Name on card"
+                  />
+            </FormGroup>
+            <Form.Row>
+                <FormGroup as={Col}>
+                  <Form.Control
+                    required
+                    type="text"
+                    name="exp_date"
+                    placeholder="Expiration date (MM/YY)"
+                  />
+                </FormGroup>
+                <FormGroup as={Col}>
+                  <Form.Control
+                    required
+                    type="text"
+                    name="security_code"
+                    placeholder="Security code"
+                  />
+                </FormGroup>
+              </Form.Row>
             </Form>
           </Row>
-          
+          <Row className="checkout-padding-left" style={{ display: (payment_type == "paypal" ? 'block' : 'none') }}>
+            <Card className="payment-form paypal-form py-5">
+              <Card.Body>
+                <Card.Text>After you complete your order, you will be directed to Paypal to securely proceed you payment.</Card.Text>
+              </Card.Body>
+            </Card>
+          </Row>
         </Col>
         <Col className = "vertical-divider py-3">
           <Container className="checkout-padding-right">
