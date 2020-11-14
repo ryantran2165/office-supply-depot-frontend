@@ -204,7 +204,10 @@ function Product() {
             </Col>
             <Col>
               <Row className="mt-3">
-                <Col>{product.weight} lbs</Col>
+                <Col>
+                  {product.weight.toFixed(1)} lb
+                  {product.weight !== 1 ? "s" : ""}
+                </Col>
               </Row>
               <Row className="mt-3">
                 <Col>{product.inventory} in stock</Col>
