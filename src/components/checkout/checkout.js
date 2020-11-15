@@ -18,20 +18,33 @@ const WEIGHT_THRESHOLD = 15;
 const SAME_DAY_DRONE_COST = 20;
 const TWO_DAY_TRUCK_COST = 20;
 const SAME_DAY_TRUCK_COST = 25;
-const PICKUP_VALUE = 0;
-const FREE_SAME_DAY_DRONE_VALUE = 1;
-const COST_SAME_DAY_DRONE_VALUE = 2;
-const FREE_TWO_DAY_TRUCK_VALUE = 3;
-const COST_SAME_DAY_TRUCK_VALUE = 4;
-const COST_TWO_DAY_TRUCK_VALUE = 5;
+const PICKUP_VALUE = "PICKUP";
+const FREE_SAME_DAY_DRONE_VALUE = "FREE_SAME_DAY_DRONE";
+const COST_SAME_DAY_DRONE_VALUE = "COST_SAME_DAY_DRONE";
+const FREE_TWO_DAY_TRUCK_VALUE = "FREE_TWO_DAY_TRUCK";
+const COST_SAME_DAY_TRUCK_VALUE = "COST_SAME_DAY_TRUCK";
+const COST_TWO_DAY_TRUCK_VALUE = "COST_TWO_DAY_TRUCK";
 
+// TODO: Form validation w/ regex
 class Checkout extends Component {
   constructor(props) {
     super(props);
     this.state = {
       cart: null,
-      shippingMethod: 0,
+      firstName: "",
+      lastName: "",
+      address1: "",
+      address2: "",
+      city: "",
+      state: "",
+      zipCode: "",
+      phone: "",
+      shippingMethod: PICKUP_VALUE,
+      subtotal: 0,
+      tax: 0,
+      shippingCost: 0,
       submitted: false,
+      validated: false,
     };
   }
 
@@ -79,7 +92,7 @@ class Checkout extends Component {
   };
 
   handleOnChangeShipping = (e) => {
-    this.setState({ shippingMethod: parseInt(e.target.value) });
+    this.setState({ shippingMethod: e.target.value });
   };
 
   calculateWeight() {
@@ -122,7 +135,13 @@ class Checkout extends Component {
     return `${totalDollars}.${remainingCents < 10 ? "0" : ""}${remainingCents}`;
   }
 
-  handleOnSubmit = (e) => {
+  handleOnSubmit = (e, subtotal, shipping, tax) => {
+    if (e.currentTarget.checkValidity() === false) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    this.setState({ validated: true });
+
     // Prevent multiple submits
     if (this.state.submitted) {
       return;
@@ -149,16 +168,46 @@ class Checkout extends Component {
           );
           return;
         } else if (i === this.state.cart.length - 1) {
+          // Get cart items to send as data
+          const items = [];
+          for (let item of this.state.cart) {
+            const itemData = {
+              product: item.product.id,
+              quantity: item.quantity,
+              price: item.product.price,
+            };
+            items.push(itemData);
+          }
+
           // All quantities valid, attempt to place order
-          const data = {};
+          const data = {
+            first_name: this.state.firstName,
+            last_name: this.state.lastName,
+            address_1: this.state.address1,
+            address_2: this.state.address2,
+            city: this.state.city,
+            state: this.state.state,
+            zip_code: this.state.zipCode,
+            phone: this.state.phone,
+            shipping_method: this.state.shippingMethod,
+            subtotal: parseFloat(subtotal),
+            tax: parseFloat(tax),
+            shipping_cost: parseFloat(shipping),
+            items: items,
+          };
 
           axios
             .post(`${API_URL}/orders/`, data, header)
             .then((res) => {
+              console.log(res);
               this.props.history.push("/account");
             })
             .catch((err) => {
-              this.tokenExpired();
+              console.log(err.response.data);
+              // for (let [key, value] of Object.entries(err.response.data)) {
+              //   console.log(key, value);
+              // }
+              // this.tokenExpired();
             });
         }
       });
@@ -184,47 +233,109 @@ class Checkout extends Component {
 
     return (
       <Container fluid className="py-5 px-md-5">
-        <Form className="checkout-address-form" onSubmit={this.handleOnSubmit}>
+        <Form
+          className="checkout-address-form"
+          onSubmit={(e) => this.handleOnSubmit(e, subtotal, shipping, tax)}
+          noValidate
+          validated={this.state.validated}
+        >
           <Row className="justify-content-center">
             <Col className="py-3 pr-lg-5" xs={12} lg={6} xl={5}>
               <h5>Shipping address</h5>
               <Form.Row>
                 <Form.Group as={Col}>
                   <Form.Label>First name</Form.Label>
-                  <Form.Control required type="text" name="first_name" />
+                  <Form.Control
+                    required
+                    type="text"
+                    placeholder="John"
+                    name="firstName"
+                    value={this.state.firstName}
+                    onChange={this.handleOnChange}
+                  />
                 </Form.Group>
                 <Form.Group as={Col}>
                   <Form.Label>Last name</Form.Label>
-                  <Form.Control required type="text" name="last_name" />
+                  <Form.Control
+                    required
+                    type="text"
+                    placeholder="Doe"
+                    name="lastName"
+                    value={this.state.lastName}
+                    onChange={this.handleOnChange}
+                  />
                 </Form.Group>
               </Form.Row>
               <Form.Row>
                 <Form.Group as={Col}>
-                  <Form.Label>Street name</Form.Label>
-                  <Form.Control required type="text" name="street_name" />
+                  <Form.Label>Street address</Form.Label>
+                  <Form.Control
+                    required
+                    type="text"
+                    placeholder="123 Main Street"
+                    name="address1"
+                    value={this.state.address1}
+                    onChange={this.handleOnChange}
+                  />
                 </Form.Group>
                 <Form.Group as={Col}>
-                  <Form.Label>Apt, suite, etc (optional)</Form.Label>
-                  <Form.Control type="text" name="apt_number" />
+                  <Form.Label>Apt, suite, etc. (optional)</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Apt 123"
+                    name="address2"
+                    value={this.state.address2}
+                    onChange={this.handleOnChange}
+                  />
                 </Form.Group>
               </Form.Row>
               <Form.Row>
                 <Form.Group as={Col}>
                   <Form.Label>City</Form.Label>
-                  <Form.Control required type="text" name="city" />
+                  <Form.Control
+                    required
+                    type="text"
+                    placeholder="San Francisco"
+                    name="city"
+                    value={this.state.city}
+                    onChange={this.handleOnChange}
+                  />
                 </Form.Group>
                 <Form.Group as={Col}>
                   <Form.Label>State</Form.Label>
-                  <Form.Control required type="text" name="state" />
+                  <Form.Control
+                    required
+                    type="text"
+                    placeholder="California"
+                    name="state"
+                    value={this.state.state}
+                    onChange={this.handleOnChange}
+                  />
                 </Form.Group>
                 <Form.Group as={Col}>
                   <Form.Label>ZIP code</Form.Label>
-                  <Form.Control required type="text" name="zip_code" />
+                  <Form.Control
+                    required
+                    type="text"
+                    placeholder="12345"
+                    name="zipCode"
+                    value={this.state.zipCode}
+                    onChange={this.handleOnChange}
+                    pattern="^\d{5}$"
+                  />
                 </Form.Group>
               </Form.Row>
               <Form.Group>
-                <Form.Label>Phone number</Form.Label>
-                <Form.Control required type="text" name="phone_number" />
+                <Form.Label>Phone (with country code)</Form.Label>
+                <Form.Control
+                  required
+                  type="text"
+                  placeholder="+13335557777"
+                  name="phone"
+                  value={this.state.phone}
+                  onChange={this.handleOnChange}
+                  pattern=""
+                />
               </Form.Group>
               <hr />
               <h5>Shipping method</h5>
@@ -311,21 +422,25 @@ class Checkout extends Component {
               <Form.Row>
                 <Form.Group as={Col}>
                   <Form.Label>Card number</Form.Label>
-                  <Form.Control required type="text" name="card_number" />
+                  <Form.Control
+                    required
+                    type="text"
+                    placeholder="1234 1234 1234 1234"
+                  />
                 </Form.Group>
                 <Form.Group as={Col}>
                   <Form.Label>Name on card</Form.Label>
-                  <Form.Control required type="text" name="name_on_card" />
+                  <Form.Control required type="text" placeholder="John Doe" />
                 </Form.Group>
               </Form.Row>
               <Form.Row>
                 <Form.Group as={Col}>
                   <Form.Label>Expiration date (MM/YY)</Form.Label>
-                  <Form.Control required type="text" name="expiration_date" />
+                  <Form.Control required type="text" placeholder="12/20" />
                 </Form.Group>
                 <Form.Group as={Col}>
                   <Form.Label>Security code</Form.Label>
-                  <Form.Control required type="text" name="security_code" />
+                  <Form.Control required type="text" placeholder="567" />
                 </Form.Group>
               </Form.Row>
             </Col>
