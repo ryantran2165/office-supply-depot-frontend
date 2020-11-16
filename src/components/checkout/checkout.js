@@ -10,22 +10,15 @@ import Col from "react-bootstrap/Col";
 import Image from "react-bootstrap/Image";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import { calculateSubtotal } from "../cart/cart";
+import { calculateSubtotal, addMonies } from "../money";
+import {
+  SHIPPING_METHODS,
+  SUBTOTAL_THRESHOLD,
+  WEIGHT_THRESHOLD,
+} from "../shipping";
 
 const TAX_RATE = 0.0725;
-const SUBTOTAL_THRESHOLD = 100;
-const WEIGHT_THRESHOLD = 15;
-const SAME_DAY_DRONE_COST = 20;
-const TWO_DAY_TRUCK_COST = 20;
-const SAME_DAY_TRUCK_COST = 25;
-const PICKUP_VALUE = "PICKUP";
-const FREE_SAME_DAY_DRONE_VALUE = "FREE_SAME_DAY_DRONE";
-const COST_SAME_DAY_DRONE_VALUE = "COST_SAME_DAY_DRONE";
-const FREE_TWO_DAY_TRUCK_VALUE = "FREE_TWO_DAY_TRUCK";
-const COST_SAME_DAY_TRUCK_VALUE = "COST_SAME_DAY_TRUCK";
-const COST_TWO_DAY_TRUCK_VALUE = "COST_TWO_DAY_TRUCK";
 
-// TODO: Form validation w/ regex
 class Checkout extends Component {
   constructor(props) {
     super(props);
@@ -39,7 +32,7 @@ class Checkout extends Component {
       state: "",
       zipCode: "",
       phone: "",
-      shippingMethod: PICKUP_VALUE,
+      shippingMethod: SHIPPING_METHODS.PICKUP.value,
       subtotal: 0,
       tax: 0,
       shippingCost: 0,
@@ -49,10 +42,6 @@ class Checkout extends Component {
   }
 
   componentDidMount() {
-    this.loadCart();
-  }
-
-  loadCart() {
     const header = {
       headers: {
         Authorization: `JWT ${localStorage.getItem("token")}`,
@@ -108,45 +97,19 @@ class Checkout extends Component {
     return tax.toFixed(2);
   }
 
-  calculateShipping() {
-    switch (this.state.shippingMethod) {
-      case COST_SAME_DAY_DRONE_VALUE:
-        return `${SAME_DAY_DRONE_COST}.00`;
-      case COST_SAME_DAY_TRUCK_VALUE:
-        return `${SAME_DAY_TRUCK_COST}.00`;
-      case COST_TWO_DAY_TRUCK_VALUE:
-        return `${TWO_DAY_TRUCK_COST}.00`;
-      default:
-        return "0.00";
-    }
-  }
-
-  calculateTotal(...monies) {
-    let totalDollars = 0;
-    let totalCents = 0;
-    for (let money of monies) {
-      const [dollars, cents] = money.split(".");
-      totalDollars += parseInt(dollars);
-      totalCents += parseInt(cents);
-    }
-    const dollarsFromCents = Math.floor(totalCents / 100);
-    const remainingCents = totalCents % 100;
-    totalDollars += dollarsFromCents;
-    return `${totalDollars}.${remainingCents < 10 ? "0" : ""}${remainingCents}`;
-  }
-
   handleOnSubmit = (e, subtotal, shipping, tax) => {
+    e.preventDefault();
+
+    // Form validation
     if (e.currentTarget.checkValidity() === false) {
-      e.preventDefault();
-      e.stopPropagation();
+      this.setState({ validated: true });
+      return;
     }
-    this.setState({ validated: true });
 
     // Prevent multiple submits
     if (this.state.submitted) {
       return;
     }
-    e.preventDefault();
     this.setState({ submitted: true });
 
     const header = {
@@ -199,15 +162,10 @@ class Checkout extends Component {
           axios
             .post(`${API_URL}/orders/`, data, header)
             .then((res) => {
-              console.log(res);
               this.props.history.push("/account");
             })
             .catch((err) => {
-              console.log(err.response.data);
-              // for (let [key, value] of Object.entries(err.response.data)) {
-              //   console.log(key, value);
-              // }
-              // this.tokenExpired();
+              this.tokenExpired();
             });
         }
       });
@@ -227,9 +185,9 @@ class Checkout extends Component {
 
     const weight = this.calculateWeight();
     const subtotal = calculateSubtotal(this.state.cart);
-    const shipping = this.calculateShipping();
+    const shipping = SHIPPING_METHODS[this.state.shippingMethod].price;
     const tax = this.calculateTax(subtotal);
-    const total = this.calculateTotal(subtotal, tax, shipping);
+    const total = addMonies([subtotal, tax, shipping]);
 
     return (
       <Container fluid className="py-5 px-md-5">
@@ -272,7 +230,7 @@ class Checkout extends Component {
                   <Form.Control
                     required
                     type="text"
-                    placeholder="123 Main Street"
+                    placeholder="012 Main Street"
                     name="address1"
                     value={this.state.address1}
                     onChange={this.handleOnChange}
@@ -282,7 +240,7 @@ class Checkout extends Component {
                   <Form.Label>Apt, suite, etc. (optional)</Form.Label>
                   <Form.Control
                     type="text"
-                    placeholder="Apt 123"
+                    placeholder="Apt 0"
                     name="address2"
                     value={this.state.address2}
                     onChange={this.handleOnChange}
@@ -306,10 +264,11 @@ class Checkout extends Component {
                   <Form.Control
                     required
                     type="text"
-                    placeholder="California"
+                    placeholder="CA"
                     name="state"
                     value={this.state.state}
                     onChange={this.handleOnChange}
+                    pattern="[A-Z]{2}"
                   />
                 </Form.Group>
                 <Form.Group as={Col}>
@@ -321,20 +280,20 @@ class Checkout extends Component {
                     name="zipCode"
                     value={this.state.zipCode}
                     onChange={this.handleOnChange}
-                    pattern="^\d{5}$"
+                    pattern="\d{5}"
                   />
                 </Form.Group>
               </Form.Row>
               <Form.Group>
-                <Form.Label>Phone (with country code)</Form.Label>
+                <Form.Label>Phone</Form.Label>
                 <Form.Control
                   required
                   type="text"
-                  placeholder="+13335557777"
+                  placeholder="0123456789"
                   name="phone"
                   value={this.state.phone}
                   onChange={this.handleOnChange}
-                  pattern=""
+                  pattern="\d{10}"
                 />
               </Form.Group>
               <hr />
@@ -344,75 +303,94 @@ class Checkout extends Component {
               </p>
               <Form.Group>
                 <Form.Check
-                  label="Pickup"
+                  label={`Free ${SHIPPING_METHODS.PICKUP.text}`}
                   type="radio"
                   name="shipping"
-                  value={PICKUP_VALUE}
-                  checked={this.state.shippingMethod === PICKUP_VALUE}
+                  value={SHIPPING_METHODS.PICKUP.value}
+                  checked={
+                    this.state.shippingMethod === SHIPPING_METHODS.PICKUP.value
+                  }
                   onChange={this.handleOnChangeShipping}
                 />
                 <Form.Check
-                  label={`Free same-day drone (weight < ${WEIGHT_THRESHOLD} lbs, subtotal > $${SUBTOTAL_THRESHOLD})`}
+                  label={`Free ${SHIPPING_METHODS.FREE_SAME_DAY_DRONE.text} (weight < ${WEIGHT_THRESHOLD} lbs, subtotal > $${SUBTOTAL_THRESHOLD})`}
                   type="radio"
                   name="shipping"
                   disabled={
                     subtotal <= SUBTOTAL_THRESHOLD || weight >= WEIGHT_THRESHOLD
                   }
-                  value={FREE_SAME_DAY_DRONE_VALUE}
+                  value={SHIPPING_METHODS.FREE_SAME_DAY_DRONE.value}
                   checked={
-                    this.state.shippingMethod === FREE_SAME_DAY_DRONE_VALUE
+                    this.state.shippingMethod ===
+                    SHIPPING_METHODS.FREE_SAME_DAY_DRONE.value
                   }
                   onChange={this.handleOnChangeShipping}
                 />
                 <Form.Check
-                  label={`$${SAME_DAY_DRONE_COST} same-day drone (weight < ${WEIGHT_THRESHOLD} lbs, subtotal <= $${SUBTOTAL_THRESHOLD})`}
+                  label={`$${
+                    SHIPPING_METHODS.COST_SAME_DAY_DRONE.price.split(".")[0]
+                  } ${
+                    SHIPPING_METHODS.COST_SAME_DAY_DRONE.text
+                  } (weight < ${WEIGHT_THRESHOLD} lbs, subtotal <= $${SUBTOTAL_THRESHOLD})`}
                   type="radio"
                   name="shipping"
                   disabled={
                     subtotal > SUBTOTAL_THRESHOLD || weight >= WEIGHT_THRESHOLD
                   }
-                  value={COST_SAME_DAY_DRONE_VALUE}
+                  value={SHIPPING_METHODS.COST_SAME_DAY_DRONE.value}
                   checked={
-                    this.state.shippingMethod === COST_SAME_DAY_DRONE_VALUE
+                    this.state.shippingMethod ===
+                    SHIPPING_METHODS.COST_SAME_DAY_DRONE.value
                   }
                   onChange={this.handleOnChangeShipping}
                 />
                 <Form.Check
-                  label={`Free 2-day truck (weight >= ${WEIGHT_THRESHOLD} lbs, subtotal > $${SUBTOTAL_THRESHOLD})`}
+                  label={`Free ${SHIPPING_METHODS.FREE_TWO_DAY_TRUCK.text} (weight >= ${WEIGHT_THRESHOLD} lbs, subtotal > $${SUBTOTAL_THRESHOLD})`}
                   type="radio"
                   name="shipping"
                   disabled={
                     subtotal <= SUBTOTAL_THRESHOLD || weight < WEIGHT_THRESHOLD
                   }
-                  value={FREE_TWO_DAY_TRUCK_VALUE}
+                  value={SHIPPING_METHODS.FREE_TWO_DAY_TRUCK.value}
                   checked={
-                    this.state.shippingMethod === FREE_TWO_DAY_TRUCK_VALUE
+                    this.state.shippingMethod ===
+                    SHIPPING_METHODS.FREE_TWO_DAY_TRUCK.value
                   }
                   onChange={this.handleOnChangeShipping}
                 />
                 <Form.Check
-                  label={`$${SAME_DAY_TRUCK_COST} same-day truck (weight >= ${WEIGHT_THRESHOLD} lbs, subtotal > $${SUBTOTAL_THRESHOLD})`}
+                  label={`$${
+                    SHIPPING_METHODS.COST_SAME_DAY_TRUCK.price.split(".")[0]
+                  } ${
+                    SHIPPING_METHODS.COST_SAME_DAY_TRUCK.text
+                  } (weight >= ${WEIGHT_THRESHOLD} lbs, subtotal > $${SUBTOTAL_THRESHOLD})`}
                   type="radio"
                   name="shipping"
                   disabled={
                     subtotal <= SUBTOTAL_THRESHOLD || weight < WEIGHT_THRESHOLD
                   }
-                  value={COST_SAME_DAY_TRUCK_VALUE}
+                  value={SHIPPING_METHODS.COST_SAME_DAY_TRUCK.value}
                   checked={
-                    this.state.shippingMethod === COST_SAME_DAY_TRUCK_VALUE
+                    this.state.shippingMethod ===
+                    SHIPPING_METHODS.COST_SAME_DAY_TRUCK.value
                   }
                   onChange={this.handleOnChangeShipping}
                 />
                 <Form.Check
-                  label={`$${TWO_DAY_TRUCK_COST} 2-day truck (weight >= ${WEIGHT_THRESHOLD} lbs, subtotal <= $${SUBTOTAL_THRESHOLD})`}
+                  label={`$${
+                    SHIPPING_METHODS.COST_TWO_DAY_TRUCK.price.split(".")[0]
+                  } ${
+                    SHIPPING_METHODS.COST_TWO_DAY_TRUCK.text
+                  } (weight >= ${WEIGHT_THRESHOLD} lbs, subtotal <= $${SUBTOTAL_THRESHOLD})`}
                   type="radio"
                   name="shipping"
                   disabled={
                     subtotal > SUBTOTAL_THRESHOLD || weight < WEIGHT_THRESHOLD
                   }
-                  value={COST_TWO_DAY_TRUCK_VALUE}
+                  value={SHIPPING_METHODS.COST_TWO_DAY_TRUCK.value}
                   checked={
-                    this.state.shippingMethod === COST_TWO_DAY_TRUCK_VALUE
+                    this.state.shippingMethod ===
+                    SHIPPING_METHODS.COST_TWO_DAY_TRUCK.value
                   }
                   onChange={this.handleOnChangeShipping}
                 />
@@ -425,7 +403,8 @@ class Checkout extends Component {
                   <Form.Control
                     required
                     type="text"
-                    placeholder="1234 1234 1234 1234"
+                    placeholder="0123456789012345"
+                    pattern="\d{16}"
                   />
                 </Form.Group>
                 <Form.Group as={Col}>
@@ -436,11 +415,21 @@ class Checkout extends Component {
               <Form.Row>
                 <Form.Group as={Col}>
                   <Form.Label>Expiration date (MM/YY)</Form.Label>
-                  <Form.Control required type="text" placeholder="12/20" />
+                  <Form.Control
+                    required
+                    type="text"
+                    placeholder="01/20"
+                    pattern="\d{2}/\d{2}"
+                  />
                 </Form.Group>
                 <Form.Group as={Col}>
                   <Form.Label>Security code</Form.Label>
-                  <Form.Control required type="text" placeholder="567" />
+                  <Form.Control
+                    required
+                    type="text"
+                    placeholder="012"
+                    pattern="\d{3,4}"
+                  />
                 </Form.Group>
               </Form.Row>
             </Col>

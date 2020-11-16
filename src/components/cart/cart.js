@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { signOut } from "../../actions/auth-actions";
@@ -11,6 +11,7 @@ import Image from "react-bootstrap/Image";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Table from "react-bootstrap/Table";
+import { calculateSubtotal } from "../money";
 
 function Cart() {
   const [cart, setCart] = useState(null);
@@ -282,20 +283,6 @@ function Cart() {
       </Row>
     </Container>
   );
-}
-
-export function calculateSubtotal(items) {
-  let totalDollars = 0;
-  let totalCents = 0;
-  for (let item of items) {
-    const [dollars, cents] = item.product.price.split(".");
-    totalDollars += parseInt(dollars) * item.quantity;
-    totalCents += parseInt(cents) * item.quantity;
-  }
-  const dollarsFromCents = Math.floor(totalCents / 100);
-  const remainingCents = totalCents % 100;
-  totalDollars += dollarsFromCents;
-  return `${totalDollars}.${remainingCents < 10 ? "0" : ""}${remainingCents}`;
 }
 
 export default Cart;

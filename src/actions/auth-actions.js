@@ -1,10 +1,10 @@
-import axios from "axios";
 import {
   SET_SIGNED_IN,
   SET_USER,
   SET_DRIVER_SIGNED_IN,
   SET_DRIVER,
 } from "./types";
+import axios from "axios";
 import { API_URL } from "../App";
 
 export const checkSignedIn = () => (dispatch) => {
