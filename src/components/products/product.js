@@ -3,6 +3,7 @@ import { useParams, useHistory } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { signOut } from "../../actions/auth-actions";
 import axios from "axios";
+import { API_URL } from "../../App";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -10,7 +11,6 @@ import Image from "react-bootstrap/Image";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import ProductBox from "./product-box";
-import { API_URL } from "../../App";
 
 const NUM_SIMILAR = 4;
 
@@ -204,7 +204,10 @@ function Product() {
             </Col>
             <Col>
               <Row className="mt-3">
-                <Col>{product.weight} lbs</Col>
+                <Col>
+                  {product.weight.toFixed(1)} lb
+                  {product.weight !== 1 ? "s" : ""}
+                </Col>
               </Row>
               <Row className="mt-3">
                 <Col>{product.inventory} in stock</Col>

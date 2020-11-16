@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { setCategory, setSubcategory } from "../../actions/products-actions";
 import axios from "axios";
+import { API_URL } from "../../App";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -13,7 +14,6 @@ import Button from "react-bootstrap/Button";
 import ProductBox from "./product-box";
 import ProductFilter from "./product-filter";
 import PRODUCT_CATEGORIES from "../product-categories";
-import { API_URL } from "../../App";
 
 const ITEMS_PER_PAGE = 20;
 const PRICE_FILTERS = {
@@ -321,7 +321,7 @@ class Products extends Component {
               {this.props.query !== "" ? ` for "${this.props.query}"` : ""}
             </h5>
           </Col>
-          <Col xs="auto">
+          <Col xs={12} sm="auto">
             <Form inline>
               <h5 className="mr-2">Sort:</h5>
               <Form.Control as="select" onChange={this.handleOnChangeSort}>

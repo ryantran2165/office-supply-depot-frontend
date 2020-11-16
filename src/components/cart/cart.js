@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { signOut } from "../../actions/auth-actions";
@@ -10,6 +10,8 @@ import Col from "react-bootstrap/Col";
 import Image from "react-bootstrap/Image";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
+import Table from "react-bootstrap/Table";
+import { calculateSubtotal } from "../money";
 
 function Cart() {
   const [cart, setCart] = useState(null);
@@ -49,20 +51,6 @@ function Cart() {
       .catch(() => {
         tokenExpired();
       });
-  }
-
-  function calculateSubtotal(items) {
-    let totalDollars = 0;
-    let totalCents = 0;
-    for (let item of items) {
-      const [dollars, cents] = item.product.price.split(".");
-      totalDollars += parseInt(dollars) * item.quantity;
-      totalCents += parseInt(cents) * item.quantity;
-    }
-    const dollarsFromCents = Math.floor(totalCents / 100);
-    const remainingCents = totalCents % 100;
-    totalDollars += dollarsFromCents;
-    return `${totalDollars}.${remainingCents < 10 ? "0" : ""}${remainingCents}`;
   }
 
   function handleOnChangeQuantity(e, item) {
@@ -189,91 +177,90 @@ function Cart() {
   }
 
   return (
-    <Container fluid className="pb-5 px-md-5">
+    <Container fluid className="py-5 px-md-5">
       <Row>
         <Col className="py-3">
-          <Row>
-            <Col>
-              <h3>
-                Your cart: {cart.length} item{cart.length > 1 ? "s" : ""}
-              </h3>
-            </Col>
-          </Row>
-          <hr />
-          <Row>
-            <Col></Col>
-            <Col>
-              <h5>Product</h5>
-            </Col>
-            <Col>
-              <h5>Price</h5>
-            </Col>
-            <Col>
-              <h5>Quantity</h5>
-            </Col>
-            <Col>
-              <h5>Subtotal</h5>
-            </Col>
-          </Row>
-          <hr />
-          {cart.map((item) => {
-            return (
-              <Row className="mb-3" key={item.id}>
-                <Col>
-                  <Link to={`/products/${item.product.id}`}>
-                    <Image
-                      rounded
-                      fluid
-                      className="cart-img shadow"
-                      src={item.product.img_url}
-                    ></Image>
-                  </Link>
-                </Col>
-                <Col>
-                  <Link
-                    className="link-hover-black"
-                    to={`/products/${item.product.id}`}
-                  >
-                    <h5>{item.product.name}</h5>
-                  </Link>
-                </Col>
-                <Col>
-                  <h5>${item.product.price}</h5>
-                </Col>
-                <Col>
-                  <Row>
-                    <Col>
-                      <Form.Control
-                        className="quantity-input"
-                        type="text"
-                        value={item.quantity}
-                        onChange={(e) => handleOnChangeQuantity(e, item)}
-                        disabled={item.product.inventory === 0}
-                      />
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col>{item.product.inventory} in stock</Col>
-                  </Row>
-                  <Row>
-                    <Col>
-                      <span
-                        className="hover-pointer font-weight-bold"
-                        onClick={(e) => handleOnClickRemove(e, item.id)}
+          <h3 className="mb-3">
+            Your cart: {cart.length} item{cart.length > 1 ? "s" : ""}
+          </h3>
+          <Table responsive>
+            <thead>
+              <tr>
+                <th></th>
+                <th>
+                  <h5>Product</h5>
+                </th>
+                <th>
+                  <h5>Price</h5>
+                </th>
+                <th>
+                  <h5>Quantity</h5>
+                </th>
+                <th>
+                  <h5>Subtotal</h5>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {cart.map((item) => {
+                return (
+                  <tr key={item.id}>
+                    <td className="text-center">
+                      <Link to={`/products/${item.product.id}`}>
+                        <Image
+                          rounded
+                          className="square-img shadow"
+                          src={item.product.img_url}
+                        />
+                      </Link>
+                    </td>
+                    <td>
+                      <Link
+                        className="link-hover-black"
+                        to={`/products/${item.product.id}`}
                       >
-                        Remove
-                      </span>
-                    </Col>
-                  </Row>
-                </Col>
-                <Col>
-                  <h5>${calculateSubtotal([item])}</h5>
-                </Col>
-              </Row>
-            );
-          })}
+                        <h5>{item.product.name}</h5>
+                      </Link>
+                    </td>
+                    <td>
+                      <h5>${item.product.price}</h5>
+                    </td>
+                    <td>
+                      <Row>
+                        <Col>
+                          <Form.Control
+                            className="quantity-input"
+                            type="text"
+                            value={item.quantity}
+                            onChange={(e) => handleOnChangeQuantity(e, item)}
+                            disabled={item.product.inventory === 0}
+                          />
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col>{item.product.inventory} in stock</Col>
+                      </Row>
+                      <Row>
+                        <Col>
+                          <span
+                            className="hover-pointer font-weight-bold"
+                            onClick={(e) => handleOnClickRemove(e, item.id)}
+                          >
+                            Remove
+                          </span>
+                        </Col>
+                      </Row>
+                    </td>
+                    <td>
+                      <h5>${calculateSubtotal([item])}</h5>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
         </Col>
-        <Col className="vertical-divider py-3" xs={12} lg={3}>
+        <Col className="left-vertical-divider py-3" xs={12} lg={3}>
           <Row className="mb-3">
             <Col>
               <h5>Subtotal</h5>

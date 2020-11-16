@@ -8,7 +8,7 @@ function ProductBox({ product }) {
     <Col className="mb-3" xs={6} lg={4} xl={3}>
       <Link className="link-hover-black" to={`/products/${product.id}`}>
         <Image
-          fluid
+          // fluid
           rounded
           className="product-box-img shadow"
           src={product.img_url}
