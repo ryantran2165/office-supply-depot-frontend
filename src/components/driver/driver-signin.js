@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { driverSignIn } from "../../actions/auth-actions";
+import { Link } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -40,11 +41,13 @@ class DriverSignIn extends Component {
           <Col xs={12} sm={10} md={8} lg={6}>
             <Row>
               <Col className="text-center mb-3">
-                <Image
-                  className="account-logo"
-                  src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"
-                  alt="OSD logo"
-                />
+                <Link to="/">
+                  <Image
+                    className="account-logo"
+                    src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"
+                    alt="OSD logo"
+                  />
+                </Link>
               </Col>
             </Row>
             <Form className="account-form" onSubmit={this.handleOnSubmit}>
@@ -70,9 +73,6 @@ class DriverSignIn extends Component {
                   value={this.state.password}
                   onChange={this.handleOnChange}
                 />
-              </Form.Group>
-              <Form.Group>
-                <Form.Check type="checkbox" label="Remember me" />
               </Form.Group>
               <Button className="button-oval w-100" type="submit">
                 Sign In

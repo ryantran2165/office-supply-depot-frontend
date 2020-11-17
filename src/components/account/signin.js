@@ -72,9 +72,6 @@ class Signin extends Component {
                   onChange={this.handleOnChange}
                 />
               </Form.Group>
-              <Form.Group>
-                <Form.Check type="checkbox" label="Remember me" />
-              </Form.Group>
               <Button className="button-oval w-100" type="submit">
                 Sign In
               </Button>
