@@ -209,7 +209,7 @@ function Cart() {
                       <Link to={`/products/${item.product.id}`}>
                         <Image
                           rounded
-                          className="square-img shadow"
+                          className="square-image-fixed shadow"
                           src={item.product.img_url}
                         />
                       </Link>

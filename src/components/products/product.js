@@ -7,12 +7,12 @@ import { API_URL } from "../../App";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import Image from "react-bootstrap/Image";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import ProductBox from "./product-box";
+import SquareImage from "../square-image";
 
-const NUM_SIMILAR = 4;
+const NUM_SIMILAR = 5;
 
 function Product() {
   const { id } = useParams();
@@ -173,16 +173,11 @@ function Product() {
 
   return (
     <Container fluid className="py-5 px-md-5">
-      <Row className="justify-content-center">
-        <Col className="mb-3" xs={12} md={6}>
-          <Image
-            fluid
-            rounded
-            className="product-img shadow"
-            src={product.img_url}
-          />
+      <Row className="justify-content-md-center">
+        <Col className="mb-3" xs={8} sm={6} md={5} lg={4} xl={3}>
+          <SquareImage src={product.img_url} />
         </Col>
-        <Col xs={12} md={6}>
+        <Col xs={12} md={7}>
           <p className="category-tag">
             {product.category}
             {product.subcategory !== "" ? ` | ${product.subcategory}` : ""}
@@ -262,7 +257,15 @@ function Product() {
           </Row>
           <Row className="justify-content-center">
             {similar.map((similarProduct) => (
-              <ProductBox product={similarProduct} key={similarProduct.id} />
+              <ProductBox
+                product={similarProduct}
+                xs={6}
+                sm={5}
+                md={4}
+                lg={2}
+                xl={2}
+                key={similarProduct.id}
+              />
             ))}
           </Row>
         </React.Fragment>

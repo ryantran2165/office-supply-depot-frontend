@@ -448,7 +448,7 @@ class Checkout extends Component {
                         <div className="item-container">
                           <Image
                             rounded
-                            className="square-img shadow"
+                            className="square-image-fixed shadow"
                             src={item.product.img_url}
                           />
                           <span className="item-quantity">{item.quantity}</span>

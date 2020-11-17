@@ -333,7 +333,7 @@ class Products extends Component {
           </Col>
         </Row>
         <Row>
-          <Col className="mb-3" xs={12} md="auto">
+          <Col className="mb-3" xs={12} md="auto" xl={3}>
             <Row className="mb-2">
               <Col>
                 <span
@@ -404,7 +404,17 @@ class Products extends Component {
           <Col>
             <Row>
               {this.state.products.map((product) => {
-                return <ProductBox product={product} key={product.id} />;
+                return (
+                  <ProductBox
+                    product={product}
+                    xs={6}
+                    sm={6}
+                    md={6}
+                    lg={4}
+                    xl={3}
+                    key={product.id}
+                  />
+                );
               })}
             </Row>
             {this.getPagination()}
