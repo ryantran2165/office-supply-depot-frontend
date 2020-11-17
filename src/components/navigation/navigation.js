@@ -59,7 +59,7 @@ class Navigation extends Component {
           <NavDropdown.Item
             className="no-submenu-navdropdown-item"
             onClick={() => this.handleNavOnClick(category, "")}
-            key={category}
+            key={`category-${category}`}
           >
             {category}
           </NavDropdown.Item>
@@ -72,12 +72,12 @@ class Navigation extends Component {
           className="submenu"
           title={category}
           drop="right"
-          key={category}
+          key={`category-${category}`}
         >
           {subcategories.map((subcategory) => (
             <NavDropdown.Item
               onClick={() => this.handleNavOnClick(category, subcategory)}
-              key={subcategory}
+              key={`category-${subcategory}`}
             >
               {subcategory}
             </NavDropdown.Item>

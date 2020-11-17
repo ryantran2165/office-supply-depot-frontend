@@ -20,7 +20,7 @@ function ProductFilter({
         <Accordion.Toggle
           className="hover-pointer"
           as={Card.Header}
-          eventKey={`${title}-accordion`}
+          eventKey={`filter-${title}-accordion`}
           onClick={() => setIsOpen(!isOpen)}
         >
           <Row>
@@ -32,7 +32,7 @@ function ProductFilter({
             </Col>
           </Row>
         </Accordion.Toggle>
-        <Accordion.Collapse eventKey={`${title}-accordion`}>
+        <Accordion.Collapse eventKey={`filter-${title}-accordion`}>
           <Card.Body>
             <Nav className="flex-column" activeKey={activeKey}>
               {links.map((link) => {
@@ -43,8 +43,8 @@ function ProductFilter({
                       setIsOpen(false);
                       onClickLink(link);
                     }}
-                    eventKey={link}
-                    key={link}
+                    eventKey={`activeKey-${link}`}
+                    key={`filter-${link}`}
                   >
                     {link}
                   </Nav.Link>

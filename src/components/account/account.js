@@ -21,43 +21,49 @@ function Account() {
     axios
       .get(`${API_URL}/orders/`, header)
       .then((res) => {
-        const orders = [];
+        const ordersData = res.data;
+        const tempOrders = [];
 
         // To indicate that orders are loaded but empty
-        if (res.data.length === 0) {
-          setOrders(orders);
+        if (ordersData.length === 0) {
+          setOrders(tempOrders);
+          return;
         }
 
-        // Replace product ids with actual products and add one at a time
-        for (let order of res.data) {
-          for (let i = 0; i < order.items.length; i++) {
-            const item = order.items[i];
+        for (const order of ordersData) {
+          // Resolve all products first
+          const promises = [];
 
+          for (const item of order.items) {
             // Previously purchased product is now deleted
             if (item.product === null) {
-              if (i === order.items.length - 1) {
-                orders.push(order);
-                orders.sort((a, b) =>
-                  b.date_ordered.localeCompare(a.date_ordered)
-                );
-                setOrders([...orders]);
-              }
               continue;
             }
 
-            axios.get(`${API_URL}/products/${item.product}`).then((res) => {
-              item.product = res.data;
-
-              // Update orders after loading the last product
-              if (i === order.items.length - 1) {
-                orders.push(order);
-                orders.sort((a, b) =>
-                  b.date_ordered.localeCompare(a.date_ordered)
-                );
-                setOrders([...orders]);
-              }
-            });
+            // Add the promise to the list
+            const promise = axios.get(`${API_URL}/products/${item.product}`);
+            promises.push(promise);
           }
+
+          Promise.all(promises).then((res) => {
+            const products = res.map((promise) => promise.data);
+
+            // Replace product id with actual product
+            for (const product of products) {
+              for (const item of order.items) {
+                if (product.id === item.product) {
+                  item.product = product;
+                  break;
+                }
+              }
+            }
+
+            tempOrders.push(order);
+            tempOrders.sort((a, b) =>
+              b.date_ordered.localeCompare(a.date_ordered)
+            );
+            setOrders([...tempOrders]);
+          });
         }
       })
       .catch(() => {
@@ -90,9 +96,9 @@ function Account() {
       <Row>
         <Col>
           <h3 className="mb-4">Your orders:</h3>
-          {orders.map((order) => (
-            <Order order={order} key={order.id} />
-          ))}
+          {orders.map((order) => {
+            return <Order order={order} key={`order-${order.id}`} />;
+          })}
         </Col>
       </Row>
     </Container>

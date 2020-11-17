@@ -50,21 +50,37 @@ class Checkout extends Component {
     axios
       .get(`${API_URL}/carts/`, header)
       .then((res) => {
-        const cart = [];
+        const cartData = res.data;
 
         // To indicate that cart is loaded but empty
-        if (res.data.length === 0) {
-          this.setState({ cart });
+        if (cartData.length === 0) {
+          this.setState({ cart: [] });
         }
 
-        // Replace product ids with actual products and add one at a time
-        for (let item of res.data) {
-          axios.get(`${API_URL}/products/${item.product}`).then((res) => {
-            item.product = res.data;
-            cart.push(item);
-            this.setState({ cart: [...cart] });
-          });
+        // Resolve all products first
+        const promises = [];
+
+        for (const item of cartData) {
+          // Add the promise to the list
+          const promise = axios.get(`${API_URL}/products/${item.product}`);
+          promises.push(promise);
         }
+
+        Promise.all(promises).then((res) => {
+          const products = res.map((promise) => promise.data);
+
+          // Replace product id with actual product
+          for (const product of products) {
+            for (const item of cartData) {
+              if (product.id === item.product) {
+                item.product = product;
+                break;
+              }
+            }
+          }
+
+          this.setState({ cart: cartData });
+        });
       })
       .catch(() => {
         this.tokenExpired();
@@ -86,7 +102,7 @@ class Checkout extends Component {
 
   calculateWeight() {
     let weight = 0;
-    for (let item of this.state.cart) {
+    for (const item of this.state.cart) {
       weight += item.quantity * item.product.weight;
     }
     return weight;
@@ -133,7 +149,7 @@ class Checkout extends Component {
         } else if (i === this.state.cart.length - 1) {
           // Get cart items to send as data
           const items = [];
-          for (let item of this.state.cart) {
+          for (const item of this.state.cart) {
             const itemData = {
               product: item.product.id,
               quantity: item.quantity,
@@ -442,7 +458,7 @@ class Checkout extends Component {
               <hr className="hr-md" />
               {this.state.cart.map((item) => {
                 return (
-                  <Row key={item.id}>
+                  <Row key={`checkout-${item.id}`}>
                     <Col className="mb-3">
                       <Link to={`/products/${item.product.id}`}>
                         <div className="item-container">

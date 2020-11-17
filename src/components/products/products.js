@@ -326,7 +326,7 @@ class Products extends Component {
               <h5 className="mr-2">Sort:</h5>
               <Form.Control as="select" onChange={this.handleOnChangeSort}>
                 {SORT_OPTIONS.map((option) => {
-                  return <option key={option}>{option}</option>;
+                  return <option key={`sort-${option}`}>{option}</option>;
                 })}
               </Form.Control>
             </Form>
@@ -346,7 +346,7 @@ class Products extends Component {
             </Row>
             <ProductFilter
               title="Category"
-              activeKey={this.props.category}
+              activeKey={`activeKey-${this.props.category}`}
               links={Object.keys(PRODUCT_CATEGORIES)}
               onClickLink={this.handleOnClickCategory}
             />
@@ -354,14 +354,14 @@ class Products extends Component {
               PRODUCT_CATEGORIES[this.props.category].length > 0 && (
                 <ProductFilter
                   title="Subcategory"
-                  activeKey={this.props.subcategory}
+                  activeKey={`activeKey-${this.props.subcategory}`}
                   links={PRODUCT_CATEGORIES[this.props.category]}
                   onClickLink={this.handleOnClickSubcategory}
                 />
               )}
             <ProductFilter
               title="Price"
-              activeKey={this.state.priceFilter}
+              activeKey={`activeKey-${this.state.priceFilter}`}
               links={Object.keys(PRICE_FILTERS)}
               onClickLink={this.handleOnClickPrice}
               customElement={
@@ -412,7 +412,7 @@ class Products extends Component {
                     md={6}
                     lg={4}
                     xl={3}
-                    key={product.id}
+                    key={`product-${product.id}`}
                   />
                 );
               })}

@@ -32,21 +32,37 @@ function Cart() {
     axios
       .get(`${API_URL}/carts/`, header)
       .then((res) => {
-        const cart = [];
+        const cartData = res.data;
 
         // To indicate that cart is loaded but empty
-        if (res.data.length === 0) {
-          setCart(cart);
+        if (cartData.length === 0) {
+          setCart([]);
         }
 
-        // Replace product ids with actual products and add one at a time
-        for (let item of res.data) {
-          axios.get(`${API_URL}/products/${item.product}`).then((res) => {
-            item.product = res.data;
-            cart.push(item);
-            setCart([...cart]);
-          });
+        // Resolve all products first
+        const promises = [];
+
+        for (const item of cartData) {
+          // Add the promise to the list
+          const promise = axios.get(`${API_URL}/products/${item.product}`);
+          promises.push(promise);
         }
+
+        Promise.all(promises).then((res) => {
+          const products = res.map((promise) => promise.data);
+
+          // Replace product id with actual product
+          for (const product of products) {
+            for (const item of cartData) {
+              if (product.id === item.product) {
+                item.product = product;
+                break;
+              }
+            }
+          }
+
+          setCart(cartData);
+        });
       })
       .catch(() => {
         tokenExpired();
@@ -85,9 +101,10 @@ function Cart() {
             const cartCopy = [...cart];
 
             // Set new quantity on corresponding item of cart copy
-            for (let itemCopy of cartCopy) {
+            for (const itemCopy of cartCopy) {
               if (itemCopy.id === item.id) {
                 itemCopy.quantity = quantity;
+                break;
               }
             }
 
@@ -204,7 +221,7 @@ function Cart() {
             <tbody>
               {cart.map((item) => {
                 return (
-                  <tr key={item.id}>
+                  <tr key={`cart-${item.id}`}>
                     <td className="text-center">
                       <Link to={`/products/${item.product.id}`}>
                         <Image

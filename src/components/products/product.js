@@ -47,7 +47,7 @@ function Product() {
           axios
             .get(`${API_URL}/carts/`, header)
             .then((res) => {
-              for (let item of res.data) {
+              for (const item of res.data) {
                 // id is a String because it comes from url params
                 if (item.product === parseInt(id)) {
                   setCartID(item.id);
@@ -264,7 +264,7 @@ function Product() {
                 md={4}
                 lg={2}
                 xl={2}
-                key={similarProduct.id}
+                key={`similar-${similarProduct.id}`}
               />
             ))}
           </Row>

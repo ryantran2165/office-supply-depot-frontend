@@ -9,7 +9,7 @@ export function calculateItemTotal(price, quantity) {
 export function addMonies(monies) {
   let totalDollars = 0;
   let totalCents = 0;
-  for (let money of monies) {
+  for (const money of monies) {
     const [dollars, cents] = money.split(".");
     totalDollars += parseInt(dollars);
     totalCents += parseInt(cents);

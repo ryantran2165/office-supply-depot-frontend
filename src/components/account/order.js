@@ -17,7 +17,7 @@ function Order({ order }) {
         <Accordion.Toggle
           className="hover-pointer"
           as={Card.Header}
-          eventKey={order.id}
+          eventKey={`order-${order.id}-accordion`}
           onClick={() => setIsOpen(!isOpen)}
         >
           <Row>
@@ -46,14 +46,14 @@ function Order({ order }) {
             </Col>
           </Row>
         </Accordion.Toggle>
-        <Accordion.Collapse eventKey={order.id}>
+        <Accordion.Collapse eventKey={`order-${order.id}-accordion`}>
           <React.Fragment>
             <ListGroup variant="flush">
               {order.items.map((item, i) => {
                 // Previously purchased product is now deleted
                 if (item.product === null) {
                   return (
-                    <ListGroup.Item key={`${order.id}-null-${i}`}>
+                    <ListGroup.Item key={`order-${order.id}-null-${i}`}>
                       <Row>
                         <Col>*unavailable product* ({item.quantity})</Col>
                         <Col className="text-right">
@@ -68,7 +68,7 @@ function Order({ order }) {
                     <Link
                       className="link-hover-black"
                       to={`/products/${item.product.id}`}
-                      key={`${order.id}-${item.product.id}`}
+                      key={`order-${order.id}-${item.product.id}`}
                     >
                       <ListGroup.Item>
                         <Row>
