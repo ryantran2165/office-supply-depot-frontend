@@ -64,9 +64,7 @@ function Cart() {
           setCart(cartData);
         });
       })
-      .catch(() => {
-        tokenExpired();
-      });
+      .catch(() => tokenExpired());
   }
 
   function handleOnChangeQuantity(e, item) {
@@ -97,7 +95,7 @@ function Cart() {
 
         axios
           .patch(`${API_URL}/carts/${item.id}/`, data, header)
-          .then((res) => {
+          .then(() => {
             const cartCopy = [...cart];
 
             // Set new quantity on corresponding item of cart copy
@@ -110,9 +108,7 @@ function Cart() {
 
             setCart(cartCopy);
           })
-          .catch((err) => {
-            tokenExpired();
-          });
+          .catch(() => tokenExpired());
       } else {
         // Not enough inventory, reload cart
         loadCart();
@@ -138,7 +134,7 @@ function Cart() {
 
     axios
       .delete(`${API_URL}/carts/${itemID}`, header)
-      .then((res) => {
+      .then(() => {
         // Find the correct index to splice
         for (let i = 0; i < cart.length; i++) {
           if (cart[i].id === itemID) {
@@ -148,9 +144,7 @@ function Cart() {
           }
         }
       })
-      .catch((err) => {
-        tokenExpired();
-      });
+      .catch(() => tokenExpired());
   }
 
   function handleOnClickCheckout() {

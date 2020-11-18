@@ -21,7 +21,7 @@ function Order({ order }) {
           onClick={() => setIsOpen(!isOpen)}
         >
           <Row>
-            <Col className="text-left" xs="auto">
+            <Col className="text-left align-self-center" xs="auto">
               <h5>Order #{order.id}</h5>
               <h6>{order.date_ordered.split("T")[0]}</h6>
               <h6>

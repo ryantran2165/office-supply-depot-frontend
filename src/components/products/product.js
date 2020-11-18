@@ -56,9 +56,7 @@ function Product() {
                 }
               }
             })
-            .catch((err) => {
-              tokenExpired();
-            });
+            .catch(() => tokenExpired());
         }
 
         // Get similar products
@@ -66,13 +64,9 @@ function Product() {
           .get(
             `${API_URL}/products/list_similar/?id=${id}&items=${NUM_SIMILAR}`
           )
-          .then((res) => {
-            setSimilar(res.data);
-          });
+          .then((res) => setSimilar(res.data));
       })
-      .catch((err) => {
-        setIsFoundProduct(false);
-      });
+      .catch(() => setIsFoundProduct(false));
     // eslint-disable-next-line
   }, [id, signedIn]);
 
@@ -124,7 +118,7 @@ function Product() {
               setCartID(res.data.id);
               setIsCartButtonDisabled(false);
             })
-            .catch((err) => {
+            .catch(() => {
               setIsCartButtonDisabled(false);
               tokenExpired();
             });
@@ -142,12 +136,12 @@ function Product() {
       // Has product in cart, remove from cart (DELETE)
       axios
         .delete(`${API_URL}/carts/${cartID}`, header)
-        .then((res) => {
+        .then(() => {
           setCartID(-1);
           setQuantity(product.inventory === 0 ? 0 : 1);
           setIsCartButtonDisabled(false);
         })
-        .catch((err) => {
+        .catch(() => {
           setIsCartButtonDisabled(false);
           tokenExpired();
         });

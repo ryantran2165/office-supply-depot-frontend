@@ -66,9 +66,7 @@ function Account() {
           });
         }
       })
-      .catch(() => {
-        tokenExpired();
-      });
+      .catch(() => tokenExpired());
     // eslint-disable-next-line
   }, []);
 
@@ -96,9 +94,9 @@ function Account() {
       <Row>
         <Col>
           <h3 className="mb-4">Your orders:</h3>
-          {orders.map((order) => {
-            return <Order order={order} key={`order-${order.id}`} />;
-          })}
+          {orders.map((order) => (
+            <Order order={order} key={`order-${order.id}`} />
+          ))}
         </Col>
       </Row>
     </Container>

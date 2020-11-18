@@ -104,9 +104,11 @@ class Products extends Component {
       queryParams += `&sort=${this.state.sort}`;
     }
 
-    axios.get(`${API_URL}/products/${queryParams}`).then((res) => {
-      this.setState({ products: res.data.products, count: res.data.count });
-    });
+    axios
+      .get(`${API_URL}/products/${queryParams}`)
+      .then((res) =>
+        this.setState({ products: res.data.products, count: res.data.count })
+      );
   };
 
   getPagination() {

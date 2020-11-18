@@ -82,9 +82,7 @@ class Checkout extends Component {
           this.setState({ cart: cartData });
         });
       })
-      .catch(() => {
-        this.tokenExpired();
-      });
+      .catch(() => this.tokenExpired());
   }
 
   tokenExpired() {
@@ -177,12 +175,8 @@ class Checkout extends Component {
 
           axios
             .post(`${API_URL}/orders/`, data, header)
-            .then((res) => {
-              this.props.history.push("/account");
-            })
-            .catch((err) => {
-              this.tokenExpired();
-            });
+            .then(() => this.props.history.push("/account"))
+            .catch(() => this.tokenExpired());
         }
       });
     }
