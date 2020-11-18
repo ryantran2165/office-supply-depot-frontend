@@ -70,10 +70,12 @@ class Products extends Component {
       prevProps.query !== this.props.query ||
       prevProps.category !== this.props.category ||
       prevProps.subcategory !== this.props.subcategory ||
-      prevState.page !== this.state.page ||
       prevState.priceFilter !== this.state.priceFilter ||
       prevState.sort !== this.state.sort
     ) {
+      // Reset page first
+      this.setState({ page: 1 }, () => this.getProducts());
+    } else if (prevState.page !== this.state.page) {
       this.getProducts();
     }
   }

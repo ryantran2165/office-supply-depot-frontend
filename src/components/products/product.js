@@ -251,7 +251,7 @@ function Product() {
           <Row className="my-4">
             <Col>
               <hr />
-              <h4 className="text-center">Similar Products</h4>
+              <h3 className="text-center">Similar Products</h3>
               <hr />
             </Col>
           </Row>

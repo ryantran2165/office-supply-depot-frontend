@@ -30,83 +30,89 @@ class App extends Component {
 
   render() {
     return (
-      <BrowserRouter>
-        <Switch>
-          <Route path="/products/:id">
-            <React.Fragment>
-              <Navigation />
-              <Product />
-            </React.Fragment>
-          </Route>
-          <Route path="/products">
-            <React.Fragment>
-              <Navigation />
-              <Products />
-            </React.Fragment>
-          </Route>
-          <RestrictedRoute
-            path="/signin"
-            component={Signin}
-            allowSignedIn={false}
-            redirect="/"
-            signedIn={this.props.signedIn}
-            navigation={Navigation}
-          />
-          <RestrictedRoute
-            path="/signup"
-            component={Signup}
-            allowSignedIn={false}
-            redirect="/"
-            signedIn={this.props.signedIn}
-            navigation={Navigation}
-          />
-          <RestrictedRoute
-            path="/account"
-            component={Account}
-            allowSignedIn={true}
-            redirect="/signin"
-            signedIn={this.props.signedIn}
-            navigation={Navigation}
-          />
-          <RestrictedRoute
-            path="/cart"
-            component={Cart}
-            allowSignedIn={true}
-            redirect="/signin"
-            signedIn={this.props.signedIn}
-            navigation={Navigation}
-          />
-          <RestrictedRoute
-            path="/checkout"
-            component={Checkout}
-            allowSignedIn={true}
-            redirect="/signin"
-            signedIn={this.props.signedIn}
-            navigation={Navigation}
-          />
-          <RestrictedRoute
-            path="/driver-signin"
-            component={DriverSignIn}
-            allowSignedIn={false}
-            redirect="/driver"
-            signedIn={this.props.driverSignedIn}
-          />
-          <RestrictedRoute
-            path="/driver"
-            component={Driver}
-            allowSignedIn={true}
-            redirect="/driver-signin"
-            signedIn={this.props.driverSignedIn}
-            navigation={DriverNavigation}
-          />
-          <Route path="/">
-            <React.Fragment>
-              <Navigation />
-              <Home />
-            </React.Fragment>
-          </Route>
-        </Switch>
-      </BrowserRouter>
+      <React.Fragment>
+        <BrowserRouter>
+          <Switch>
+            <Route path="/products/:id">
+              <React.Fragment>
+                <Navigation />
+                <Product />
+              </React.Fragment>
+            </Route>
+            <Route path="/products">
+              <React.Fragment>
+                <Navigation />
+                <Products />
+              </React.Fragment>
+            </Route>
+            <RestrictedRoute
+              path="/signin"
+              component={Signin}
+              allowSignedIn={false}
+              redirect="/"
+              signedIn={this.props.signedIn}
+              navigation={Navigation}
+            />
+            <RestrictedRoute
+              path="/signup"
+              component={Signup}
+              allowSignedIn={false}
+              redirect="/"
+              signedIn={this.props.signedIn}
+              navigation={Navigation}
+            />
+            <RestrictedRoute
+              path="/account"
+              component={Account}
+              allowSignedIn={true}
+              redirect="/signin"
+              signedIn={this.props.signedIn}
+              navigation={Navigation}
+            />
+            <RestrictedRoute
+              path="/cart"
+              component={Cart}
+              allowSignedIn={true}
+              redirect="/signin"
+              signedIn={this.props.signedIn}
+              navigation={Navigation}
+            />
+            <RestrictedRoute
+              path="/checkout"
+              component={Checkout}
+              allowSignedIn={true}
+              redirect="/signin"
+              signedIn={this.props.signedIn}
+              navigation={Navigation}
+            />
+            <RestrictedRoute
+              path="/driver-signin"
+              component={DriverSignIn}
+              allowSignedIn={false}
+              redirect="/driver"
+              signedIn={this.props.driverSignedIn}
+            />
+            <RestrictedRoute
+              path="/driver"
+              component={Driver}
+              allowSignedIn={true}
+              redirect="/driver-signin"
+              signedIn={this.props.driverSignedIn}
+              navigation={DriverNavigation}
+            />
+            <Route path="/">
+              <React.Fragment>
+                <Navigation />
+                <Home />
+              </React.Fragment>
+            </Route>
+          </Switch>
+        </BrowserRouter>
+        <footer className="text-center mt-auto p-3">
+          <h5>Made by Ryan Tran, Thanh Tran, and Aaron Smith</h5>
+          <h5>*** This is not a real site! ***</h5>
+        </footer>
+      </React.Fragment>
     );
   }
 }
