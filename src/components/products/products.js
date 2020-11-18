@@ -15,7 +15,7 @@ import ProductBox from "./product-box";
 import ProductFilter from "./product-filter";
 import PRODUCT_CATEGORIES from "../product-categories";
 
-const ITEMS_PER_PAGE = 20;
+const ITEMS_PER_PAGE = 12;
 const PRICE_FILTERS = {
   "$25 & Under": {
     minPrice: 0,

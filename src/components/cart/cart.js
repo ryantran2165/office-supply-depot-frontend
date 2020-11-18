@@ -64,7 +64,7 @@ function Cart() {
           setCart(cartData);
         });
       })
-      .catch(() => tokenExpired());
+      .catch(() => tokenExpired(dispatch));
   }
 
   function handleOnChangeQuantity(e, item) {
@@ -108,7 +108,7 @@ function Cart() {
 
             setCart(cartCopy);
           })
-          .catch(() => tokenExpired());
+          .catch(() => tokenExpired(dispatch));
       } else {
         // Not enough inventory, reload cart
         loadCart();
@@ -144,7 +144,7 @@ function Cart() {
           }
         }
       })
-      .catch(() => tokenExpired());
+      .catch(() => tokenExpired(dispatch));
   }
 
   function handleOnClickCheckout() {
@@ -166,11 +166,6 @@ function Cart() {
         }
       });
     }
-  }
-
-  function tokenExpired() {
-    dispatch(signOut());
-    alert("Your token expired.\nPlease sign in again to use cart.");
   }
 
   // Make sure cart is not null before rendering
@@ -294,6 +289,11 @@ function Cart() {
       </Row>
     </Container>
   );
+}
+
+function tokenExpired(dispatch) {
+  dispatch(signOut());
+  alert("Your token expired.\nPlease sign in again to use cart.");
 }
 
 export default Cart;

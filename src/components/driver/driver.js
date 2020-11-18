@@ -7,6 +7,7 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Delivery from "./delivery";
+import Map from "./map";
 
 function Driver() {
   const [deliveries, setDeliveries] = useState(null);
@@ -21,14 +22,9 @@ function Driver() {
     axios
       .get(`${API_URL}/orders/list_deliveries/`, header)
       .then((res) => setDeliveries(res.data))
-      .catch(() => tokenExpired());
+      .catch(() => tokenExpired(dispatch));
     // eslint-disable-next-line
   }, []);
-
-  function tokenExpired() {
-    dispatch(driverSignOut());
-    alert("Your token expired.\nPlease sign in again to use driver.");
-  }
 
   function handleOnClickGetDirections(delivery) {}
 
@@ -78,10 +74,18 @@ function Driver() {
               key={`delivery-${delivery.id}`}
             />
           ))}
+          <div className="mt-5">
+            <Map />
+          </div>
         </Col>
       </Row>
     </Container>
   );
+}
+
+function tokenExpired(dispatch) {
+  dispatch(driverSignOut(dispatch));
+  alert("Your token expired.\nPlease sign in again to use driver.");
 }
 
 export default Driver;

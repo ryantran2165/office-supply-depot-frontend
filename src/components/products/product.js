@@ -56,7 +56,7 @@ function Product() {
                 }
               }
             })
-            .catch(() => tokenExpired());
+            .catch(() => tokenExpired(dispatch));
         }
 
         // Get similar products
@@ -120,7 +120,7 @@ function Product() {
             })
             .catch(() => {
               setIsCartButtonDisabled(false);
-              tokenExpired();
+              tokenExpired(dispatch);
             });
         } else {
           // Not enough inventory, update the page
@@ -143,14 +143,9 @@ function Product() {
         })
         .catch(() => {
           setIsCartButtonDisabled(false);
-          tokenExpired();
+          tokenExpired(dispatch);
         });
     }
-  }
-
-  function tokenExpired() {
-    dispatch(signOut());
-    alert("Your token expired.\nPlease sign in again to use cart.");
   }
 
   // Make sure product is not null before rendering
@@ -266,6 +261,11 @@ function Product() {
       )}
     </Container>
   );
+}
+
+function tokenExpired(dispatch) {
+  dispatch(signOut());
+  alert("Your token expired.\nPlease sign in again to use cart.");
 }
 
 export default Product;

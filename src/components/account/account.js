@@ -66,14 +66,9 @@ function Account() {
           });
         }
       })
-      .catch(() => tokenExpired());
+      .catch(() => tokenExpired(dispatch));
     // eslint-disable-next-line
   }, []);
-
-  function tokenExpired() {
-    dispatch(signOut());
-    alert("Your token expired.\nPlease sign in again to use account.");
-  }
 
   // Make sure orders is not null before rendering
   if (orders === null) {
@@ -101,6 +96,11 @@ function Account() {
       </Row>
     </Container>
   );
+}
+
+function tokenExpired(dispatch) {
+  dispatch(signOut());
+  alert("Your token expired.\nPlease sign in again to use account.");
 }
 
 export default Account;
