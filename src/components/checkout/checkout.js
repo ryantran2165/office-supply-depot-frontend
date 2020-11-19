@@ -221,6 +221,7 @@ class Checkout extends Component {
                     name="firstName"
                     value={this.state.firstName}
                     onChange={this.handleOnChange}
+                    maxLength="128"
                   />
                 </Form.Group>
                 <Form.Group as={Col}>
@@ -232,6 +233,7 @@ class Checkout extends Component {
                     name="lastName"
                     value={this.state.lastName}
                     onChange={this.handleOnChange}
+                    maxLength="128"
                   />
                 </Form.Group>
               </Form.Row>
@@ -245,6 +247,7 @@ class Checkout extends Component {
                     name="address1"
                     value={this.state.address1}
                     onChange={this.handleOnChange}
+                    maxLength="128"
                   />
                 </Form.Group>
                 <Form.Group as={Col}>
@@ -255,6 +258,7 @@ class Checkout extends Component {
                     name="address2"
                     value={this.state.address2}
                     onChange={this.handleOnChange}
+                    maxLength="128"
                   />
                 </Form.Group>
               </Form.Row>
@@ -268,6 +272,7 @@ class Checkout extends Component {
                     name="city"
                     value={this.state.city}
                     onChange={this.handleOnChange}
+                    maxLength="128"
                   />
                 </Form.Group>
                 <Form.Group as={Col}>
@@ -280,6 +285,7 @@ class Checkout extends Component {
                     value={this.state.state}
                     onChange={this.handleOnChange}
                     pattern="[A-Z]{2}"
+                    maxLength="2"
                   />
                 </Form.Group>
                 <Form.Group as={Col}>
@@ -292,6 +298,7 @@ class Checkout extends Component {
                     value={this.state.zipCode}
                     onChange={this.handleOnChange}
                     pattern="\d{5}"
+                    maxLength="5"
                   />
                 </Form.Group>
               </Form.Row>
@@ -305,6 +312,7 @@ class Checkout extends Component {
                   value={this.state.phone}
                   onChange={this.handleOnChange}
                   pattern="\d{10}"
+                  maxLength="10"
                 />
               </Form.Group>
               <hr />
@@ -428,11 +436,17 @@ class Checkout extends Component {
                     type="text"
                     placeholder="0123456789012345"
                     pattern="\d{16}"
+                    maxLength="16"
                   />
                 </Form.Group>
                 <Form.Group as={Col}>
                   <Form.Label>Name on card</Form.Label>
-                  <Form.Control required type="text" placeholder="John Doe" />
+                  <Form.Control
+                    required
+                    type="text"
+                    placeholder="John Doe"
+                    maxLength="128"
+                  />
                 </Form.Group>
               </Form.Row>
               <Form.Row>
@@ -443,6 +457,7 @@ class Checkout extends Component {
                     type="text"
                     placeholder="01/20"
                     pattern="\d{2}/\d{2}"
+                    maxLength="5"
                   />
                 </Form.Group>
                 <Form.Group as={Col}>
@@ -452,6 +467,7 @@ class Checkout extends Component {
                     type="text"
                     placeholder="012"
                     pattern="\d{3,4}"
+                    maxLength="4"
                   />
                 </Form.Group>
               </Form.Row>

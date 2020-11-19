@@ -63,6 +63,7 @@ class Signup extends Component {
                   name="firstName"
                   value={this.state.firstName}
                   onChange={this.handleOnChange}
+                  maxLength="128"
                 />
               </Form.Group>
               <Form.Group>
@@ -74,6 +75,7 @@ class Signup extends Component {
                   name="lastName"
                   value={this.state.lastName}
                   onChange={this.handleOnChange}
+                  maxLength="128"
                 />
               </Form.Group>
               <Form.Group>
@@ -85,6 +87,7 @@ class Signup extends Component {
                   name="email"
                   value={this.state.email}
                   onChange={this.handleOnChange}
+                  maxLength="254"
                 />
               </Form.Group>
               <Form.Group>
@@ -96,6 +99,7 @@ class Signup extends Component {
                   name="password"
                   value={this.state.password}
                   onChange={this.handleOnChange}
+                  maxLength="128"
                 />
               </Form.Group>
               <Button className="button-oval w-100" type="submit">

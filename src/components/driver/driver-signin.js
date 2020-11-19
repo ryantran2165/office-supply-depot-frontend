@@ -61,6 +61,7 @@ class DriverSignIn extends Component {
                   name="email"
                   value={this.state.email}
                   onChange={this.handleOnChange}
+                  maxLength="254"
                 />
               </Form.Group>
               <Form.Group>
@@ -72,6 +73,7 @@ class DriverSignIn extends Component {
                   name="password"
                   value={this.state.password}
                   onChange={this.handleOnChange}
+                  maxLength="128"
                 />
               </Form.Group>
               <Button className="button-oval w-100" type="submit">
