@@ -61,15 +61,15 @@ function Cart() {
             }
           }
 
+          cartData.sort((a, b) => a.product.name.localeCompare(b.product.name));
           setCart(cartData);
         });
       })
       .catch(() => tokenExpired(dispatch));
   }
 
-  function handleOnChangeQuantity(e, item) {
+  function handleOnChangeQuantity(quantity, item) {
     const re = /^\d{1,3}$/;
-    let quantity = parseInt(e.target.value);
 
     // Failed regex: 1 to 3 digit number
     if (!re.test(quantity)) {
@@ -148,24 +148,35 @@ function Cart() {
   }
 
   function handleOnClickCheckout() {
-    // Check all quantities are <= the available stock
-    for (let i = 0; i < cart.length; i++) {
-      const item = cart[i];
+    const promises = [];
 
-      axios.get(`${API_URL}/products/${item.product.id}`).then((res) => {
-        // Not enough inventory
-        if (item.quantity > res.data.inventory) {
-          loadCart();
-          alert(
-            "Some products' inventories have changed.\nPlease reduce quantities that are greater than the available stock or remove the product."
-          );
-          return;
-        } else if (i === cart.length - 1) {
-          // All quantities valid, change page to checkout
-          history.push("/checkout");
-        }
-      });
+    // Check all quantities are <= the available stock
+    for (const item of cart) {
+      const promise = axios.get(`${API_URL}/products/${item.product.id}`);
+      promises.push(promise);
     }
+
+    Promise.all(promises).then((res) => {
+      const products = res.map((promise) => promise.data);
+
+      for (const product of products) {
+        for (const item of cart) {
+          if (product.id === item.product.id) {
+            // Not enough inventory
+            if (item.quantity > product.inventory) {
+              loadCart();
+              alert(
+                "Some products' inventories have changed.\nPlease reduce quantities that are greater than the available stock or remove the product."
+              );
+              return;
+            }
+          }
+        }
+      }
+
+      // All quantities valid, change page to checkout
+      history.push("/checkout");
+    });
   }
 
   // Make sure cart is not null before rendering
@@ -190,7 +201,7 @@ function Cart() {
             Your cart: {cart.length} item{cart.length > 1 ? "s" : ""}
           </h3>
           <Table responsive>
-            <thead>
+            <thead className="text-center">
               <tr>
                 <th></th>
                 <th>
@@ -207,7 +218,7 @@ function Cart() {
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="text-center">
               {cart.map((item) => {
                 return (
                   <tr key={`cart-${item.id}`}>
@@ -220,27 +231,50 @@ function Cart() {
                         />
                       </Link>
                     </td>
-                    <td>
+                    <td className="align-middle">
                       <Link
                         className="link-hover-black"
                         to={`/products/${item.product.id}`}
                       >
-                        <h5>{item.product.name}</h5>
+                        <h5 className="d-inline">{item.product.name}</h5>
                       </Link>
                     </td>
-                    <td>
+                    <td className="align-middle">
                       <h5>${item.product.price}</h5>
                     </td>
-                    <td>
+                    <td className="align-middle text-center">
                       <Row>
-                        <Col>
+                        <Col style={{ minWidth: "200px" }}>
+                          <Button
+                            className="button-round"
+                            onClick={() =>
+                              handleOnChangeQuantity(item.quantity - 1, item)
+                            }
+                            disabled={item.product.inventory === 0}
+                          >
+                            -
+                          </Button>
                           <Form.Control
-                            className="quantity-input"
+                            className="quantity-input mx-3"
                             type="text"
                             value={item.quantity}
-                            onChange={(e) => handleOnChangeQuantity(e, item)}
+                            onChange={(e) =>
+                              handleOnChangeQuantity(
+                                parseInt(e.target.value),
+                                item
+                              )
+                            }
                             disabled={item.product.inventory === 0}
                           />
+                          <Button
+                            className="button-round"
+                            onClick={() =>
+                              handleOnChangeQuantity(item.quantity + 1, item)
+                            }
+                            disabled={item.product.inventory === 0}
+                          >
+                            +
+                          </Button>
                         </Col>
                       </Row>
                       <Row>
@@ -257,7 +291,7 @@ function Cart() {
                         </Col>
                       </Row>
                     </td>
-                    <td>
+                    <td className="align-middle">
                       <h5>${calculateSubtotal([item])}</h5>
                     </td>
                   </tr>

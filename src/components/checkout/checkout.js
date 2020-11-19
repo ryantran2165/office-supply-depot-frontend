@@ -80,6 +80,7 @@ class Checkout extends Component {
             }
           }
 
+          cartData.sort((a, b) => a.product.name.localeCompare(b.product.name));
           this.setState({ cart: cartData });
         });
       })
@@ -132,55 +133,65 @@ class Checkout extends Component {
         Authorization: `JWT ${localStorage.getItem("token")}`,
       },
     };
+    const promises = [];
 
     // Check all quantities are <= the available stock
-    for (let i = 0; i < this.state.cart.length; i++) {
-      const item = this.state.cart[i];
-
-      axios.get(`${API_URL}/products/${item.product.id}`).then((res) => {
-        // Not enough inventory
-        if (item.quantity > res.data.inventory) {
-          this.props.history.push("/cart");
-          alert(
-            "Some products' inventories have changed.\nPlease reduce quantities that are greater than the available stock or remove the product."
-          );
-          return;
-        } else if (i === this.state.cart.length - 1) {
-          // Get cart items to send as data
-          const items = [];
-          for (const item of this.state.cart) {
-            const itemData = {
-              product: item.product.id,
-              quantity: item.quantity,
-              price: item.product.price,
-            };
-            items.push(itemData);
-          }
-
-          // All quantities valid, attempt to place order
-          const data = {
-            first_name: this.state.firstName,
-            last_name: this.state.lastName,
-            address_1: this.state.address1,
-            address_2: this.state.address2,
-            city: this.state.city,
-            state: this.state.state,
-            zip_code: this.state.zipCode,
-            phone: this.state.phone,
-            shipping_method: this.state.shippingMethod,
-            subtotal: parseFloat(subtotal),
-            tax: parseFloat(tax),
-            shipping_cost: parseFloat(shipping),
-            items: items,
-          };
-
-          axios
-            .post(`${API_URL}/orders/`, data, header)
-            .then(() => this.props.history.push("/account"))
-            .catch(() => this.tokenExpired());
-        }
-      });
+    for (const item of this.state.cart) {
+      const promise = axios.get(`${API_URL}/products/${item.product.id}`);
+      promises.push(promise);
     }
+
+    Promise.all(promises).then((res) => {
+      const products = res.map((promise) => promise.data);
+
+      for (const product of products) {
+        for (const item of this.state.cart) {
+          if (product.id === item.product.id) {
+            // Not enough inventory
+            if (item.quantity > product.inventory) {
+              this.props.history.push("/cart");
+              alert(
+                "Some products' inventories have changed.\nPlease reduce quantities that are greater than the available stock or remove the product."
+              );
+              return;
+            }
+          }
+        }
+      }
+
+      // All quantities valid, get cart items to send as data
+      const items = [];
+      for (const item of this.state.cart) {
+        const itemData = {
+          product: item.product.id,
+          quantity: item.quantity,
+          price: item.product.price,
+        };
+        items.push(itemData);
+      }
+
+      // All quantities valid, attempt to place order
+      const data = {
+        first_name: this.state.firstName,
+        last_name: this.state.lastName,
+        address_1: this.state.address1,
+        address_2: this.state.address2,
+        city: this.state.city,
+        state: this.state.state,
+        zip_code: this.state.zipCode,
+        phone: this.state.phone,
+        shipping_method: this.state.shippingMethod,
+        subtotal: parseFloat(subtotal),
+        tax: parseFloat(tax),
+        shipping_cost: parseFloat(shipping),
+        items: items,
+      };
+
+      axios
+        .post(`${API_URL}/orders/`, data, header)
+        .then(() => this.props.history.push("/account"))
+        .catch(() => this.tokenExpired());
+    });
   };
 
   render() {
@@ -494,7 +505,7 @@ class Checkout extends Component {
                         </div>
                       </Link>
                     </Col>
-                    <Col>
+                    <Col className="align-self-center">
                       <h5>${calculateSubtotal([item])}</h5>
                     </Col>
                   </Row>
@@ -550,7 +561,7 @@ class Checkout extends Component {
 }
 
 Checkout.propTypes = {
-  history: PropTypes.array,
+  history: PropTypes.object,
   signOut: PropTypes.func,
 };
 

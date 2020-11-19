@@ -40,7 +40,9 @@ function Delivery({ delivery, onClickSetDestination, onClickSubmitDelivery }) {
                 <br />
                 {delivery.phone}
               </p>
-              <Button onClick={onClickSetDestination}>Set destination</Button>
+              <Button className="button-orange" onClick={onClickSetDestination}>
+                Set destination
+              </Button>
             </Card.Body>
             <Card.Footer>
               <Button onClick={onClickSubmitDelivery}>Submit delivery</Button>

@@ -70,18 +70,13 @@ function Product() {
     // eslint-disable-next-line
   }, [id, signedIn]);
 
-  function handleOnClickQuantity(quantity) {
-    quantity = Math.max(quantity, 1);
-    quantity = Math.min(quantity, product.inventory);
-    setQuantity(quantity);
-  }
-
-  function handleOnChangeQuantity(e) {
+  function handleOnChangeQuantity(quantity) {
     const re = /^\d{1,3}$/;
-    const quantity = parseInt(e.target.value);
 
     if (re.test(quantity)) {
-      handleOnClickQuantity(quantity);
+      quantity = Math.max(quantity, 1);
+      quantity = Math.min(quantity, product.inventory);
+      setQuantity(quantity);
     }
   }
 
@@ -200,7 +195,7 @@ function Product() {
                 <Col>
                   <Button
                     className="button-round"
-                    onClick={() => handleOnClickQuantity(quantity - 1)}
+                    onClick={() => handleOnChangeQuantity(quantity - 1)}
                     disabled={product.inventory === 0 || cartID !== -1}
                   >
                     -
@@ -209,12 +204,14 @@ function Product() {
                     className="quantity-input mx-3"
                     type="text"
                     value={quantity}
-                    onChange={handleOnChangeQuantity}
+                    onChange={(e) =>
+                      handleOnChangeQuantity(parseInt(e.target.value))
+                    }
                     disabled={product.inventory === 0 || cartID !== -1}
                   />
                   <Button
                     className="button-round"
-                    onClick={() => handleOnClickQuantity(quantity + 1)}
+                    onClick={() => handleOnChangeQuantity(quantity + 1)}
                     disabled={product.inventory === 0 || cartID !== -1}
                   >
                     +
