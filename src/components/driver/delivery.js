@@ -5,7 +5,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 
-function Delivery({ delivery, onClickGetDirections, onClickSubmitDelivery }) {
+function Delivery({ delivery, onClickSetDestination, onClickSubmitDelivery }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -39,14 +39,10 @@ function Delivery({ delivery, onClickGetDirections, onClickSubmitDelivery }) {
                 <br />
                 {delivery.phone}
               </p>
-              <Button onClick={() => onClickGetDirections(delivery)}>
-                Get directions
-              </Button>
+              <Button onClick={onClickSetDestination}>Set destination</Button>
             </Card.Body>
             <Card.Footer>
-              <Button onClick={() => onClickSubmitDelivery(delivery.id)}>
-                Submit delivery
-              </Button>
+              <Button onClick={onClickSubmitDelivery}>Submit delivery</Button>
             </Card.Footer>
           </React.Fragment>
         </Accordion.Collapse>

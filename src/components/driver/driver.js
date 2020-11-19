@@ -6,11 +6,16 @@ import { API_URL } from "../../App";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
 import Delivery from "./delivery";
 import Map from "./map";
 
 function Driver() {
   const [deliveries, setDeliveries] = useState(null);
+  const [origin, setOrigin] = useState("");
+  const [destination, setDestination] = useState("");
+  const [newRequest, setNewRequest] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -25,8 +30,6 @@ function Driver() {
       .catch(() => tokenExpired(dispatch));
     // eslint-disable-next-line
   }, []);
-
-  function handleOnClickGetDirections(delivery) {}
 
   function handleOnClickSubmitDelivery(id) {
     const header = {
@@ -69,14 +72,48 @@ function Driver() {
           {deliveries.map((delivery) => (
             <Delivery
               delivery={delivery}
-              onClickGetDirections={handleOnClickGetDirections}
-              onClickSubmitDelivery={handleOnClickSubmitDelivery}
+              onClickSetDestination={() =>
+                setDestination(
+                  `${delivery.address_1}, ${delivery.city}, ${delivery.state} ${delivery.zip_code}`
+                )
+              }
+              onClickSubmitDelivery={() =>
+                handleOnClickSubmitDelivery(delivery.id)
+              }
               key={`delivery-${delivery.id}`}
             />
           ))}
-          <div className="mt-5">
-            <Map />
-          </div>
+          <Form
+            className="mt-5 mb-3"
+            onSubmit={(e) => {
+              e.preventDefault();
+              setNewRequest(true);
+            }}
+          >
+            <Form.Group>
+              <Form.Label>Origin</Form.Label>
+              <Form.Control
+                type="text"
+                value={origin}
+                onChange={(e) => setOrigin(e.target.value)}
+              />
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Destination</Form.Label>
+              <Form.Control
+                type="text"
+                value={destination}
+                onChange={(e) => setDestination(e.target.value)}
+              />
+            </Form.Group>
+            <Button type="submit">Get directions</Button>
+          </Form>
+          <Map
+            origin={origin}
+            destination={destination}
+            newRequest={newRequest}
+            requestHandled={() => setNewRequest(false)}
+          />
         </Col>
       </Row>
     </Container>
