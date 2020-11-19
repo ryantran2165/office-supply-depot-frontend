@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import Image from "react-bootstrap/Image";
 
 function SquareImage({ src }) {
@@ -8,5 +9,9 @@ function SquareImage({ src }) {
     </div>
   );
 }
+
+SquareImage.propTypes = {
+  src: PropTypes.string,
+};
 
 export default SquareImage;

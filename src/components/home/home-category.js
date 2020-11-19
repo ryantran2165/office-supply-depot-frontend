@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setCategory } from "../../actions/products-actions";
@@ -21,5 +22,10 @@ function HomeCategory({ categoryName, imgSrc }) {
     </Col>
   );
 }
+
+HomeCategory.propTypes = {
+  categoryName: PropTypes.string,
+  imgSrc: PropTypes.string,
+};
 
 export default HomeCategory;

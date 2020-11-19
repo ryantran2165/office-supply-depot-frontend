@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 import {
   useLoadScript,
   GoogleMap,
@@ -10,18 +11,17 @@ const containerStyle = {
   width: "100%",
   height: "400px",
 };
-
 const center = {
-  lat: 37.335384,
-  lng: -121.881061,
+  lat: 37.335241,
+  lng: -121.881074,
 };
 
 function Map({ origin, destination, newRequest, requestHandled }) {
-  const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: "AIzaSyCvNOUWjkIi8V_jKReYrhrNSSHDnVKn2K8",
-  });
   const [response, setResponse] = useState(null);
   const [found, setFound] = useState(true);
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: "AIzaSyCvNOUWjkIi8V_jKReYrhrNSSHDnVKn2K8",
+  });
 
   function directionsCallback(response) {
     requestHandled();
@@ -37,10 +37,6 @@ function Map({ origin, destination, newRequest, requestHandled }) {
       setResponse(null);
       setFound(false);
     }
-  }
-
-  if (loadError) {
-    return "Error loading map";
   }
 
   if (isLoaded) {
@@ -72,5 +68,12 @@ function Map({ origin, destination, newRequest, requestHandled }) {
 
   return "";
 }
+
+Map.propTypes = {
+  origin: PropTypes.string,
+  destination: PropTypes.string,
+  newRequest: PropTypes.bool,
+  requestHandled: PropTypes.func,
+};
 
 export default Map;

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 import Accordion from "react-bootstrap/Accordion";
 import Card from "react-bootstrap/Card";
 import Row from "react-bootstrap/Row";
@@ -58,5 +59,13 @@ function ProductFilter({
     </Accordion>
   );
 }
+
+ProductFilter.propTypes = {
+  title: PropTypes.string,
+  activeKey: PropTypes.string,
+  links: PropTypes.array,
+  onClickLink: PropTypes.func,
+  customElement: PropTypes.element,
+};
 
 export default ProductFilter;

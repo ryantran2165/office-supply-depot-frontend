@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
 import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { signOut } from "../../actions/auth-actions";
@@ -32,7 +33,7 @@ class Checkout extends Component {
       state: "",
       zipCode: "",
       phone: "",
-      shippingMethod: SHIPPING_METHODS.PICKUP.value,
+      shippingMethod: SHIPPING_METHODS.PICKUP_1.value,
       subtotal: 0,
       tax: 0,
       shippingCost: 0,
@@ -313,12 +314,24 @@ class Checkout extends Component {
               </p>
               <Form.Group>
                 <Form.Check
-                  label={`Free ${SHIPPING_METHODS.PICKUP.text}`}
+                  label={`Free ${SHIPPING_METHODS.PICKUP_1.text}`}
                   type="radio"
                   name="shipping"
-                  value={SHIPPING_METHODS.PICKUP.value}
+                  value={SHIPPING_METHODS.PICKUP_1.value}
                   checked={
-                    this.state.shippingMethod === SHIPPING_METHODS.PICKUP.value
+                    this.state.shippingMethod ===
+                    SHIPPING_METHODS.PICKUP_1.value
+                  }
+                  onChange={this.handleOnChangeShipping}
+                />
+                <Form.Check
+                  label={`Free ${SHIPPING_METHODS.PICKUP_2.text}`}
+                  type="radio"
+                  name="shipping"
+                  value={SHIPPING_METHODS.PICKUP_2.value}
+                  checked={
+                    this.state.shippingMethod ===
+                    SHIPPING_METHODS.PICKUP_2.value
                   }
                   onChange={this.handleOnChangeShipping}
                 />
@@ -519,5 +532,10 @@ class Checkout extends Component {
     );
   }
 }
+
+Checkout.propTypes = {
+  history: PropTypes.array,
+  signOut: PropTypes.func,
+};
 
 export default connect(null, { signOut })(withRouter(Checkout));

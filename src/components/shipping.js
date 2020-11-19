@@ -1,8 +1,13 @@
 export const SHIPPING_METHODS = {
-  PICKUP: {
+  PICKUP_1: {
     price: "0.00",
-    text: "pickup",
-    value: "PICKUP",
+    text: "pickup at location #1",
+    value: "PICKUP_1",
+  },
+  PICKUP_2: {
+    price: "0.00",
+    text: "pickup at location #2",
+    value: "PICKUP_2",
   },
   FREE_SAME_DAY_DRONE: {
     price: "0.00",

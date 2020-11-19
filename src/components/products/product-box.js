@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import Col from "react-bootstrap/Col";
 import SquareImage from "../square-image";
@@ -14,5 +15,14 @@ function ProductBox({ product, xs, sm, md, lg, xl }) {
     </Col>
   );
 }
+
+ProductBox.propTypes = {
+  product: PropTypes.object,
+  xs: PropTypes.number,
+  sm: PropTypes.number,
+  md: PropTypes.number,
+  lg: PropTypes.number,
+  xl: PropTypes.number,
+};
 
 export default ProductBox;

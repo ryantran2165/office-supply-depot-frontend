@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 import Accordion from "react-bootstrap/Accordion";
 import Card from "react-bootstrap/Card";
 import Row from "react-bootstrap/Row";
@@ -50,5 +51,11 @@ function Delivery({ delivery, onClickSetDestination, onClickSubmitDelivery }) {
     </Accordion>
   );
 }
+
+Delivery.propTypes = {
+  delivery: PropTypes.object,
+  onClickSetDestination: PropTypes.func,
+  onClickSubmitDelivery: PropTypes.func,
+};
 
 export default Delivery;
