@@ -319,16 +319,22 @@ class Products extends Component {
     return (
       <Container fluid className="pb-5 px-md-5">
         <Row className="align-items-center my-3">
-          <Col>
-            <h5>
+          <Col className="mb-3 mb-sm-0">
+            <h5 className="mb-0">
               Showing {this.state.count} results
               {this.props.query !== "" ? ` for "${this.props.query}"` : ""}
             </h5>
           </Col>
           <Col xs={12} sm="auto">
             <Form inline>
-              <h5 className="mr-2">Sort:</h5>
-              <Form.Control as="select" onChange={this.handleOnChangeSort}>
+              <Form.Label className="mb-0 mr-2">
+                <h5 className="mb-0">Sort:</h5>
+              </Form.Label>
+              <Form.Control
+                className="w-auto"
+                as="select"
+                onChange={this.handleOnChangeSort}
+              >
                 {SORT_OPTIONS.map((option) => {
                   return <option key={`sort-${option}`}>{option}</option>;
                 })}
@@ -382,6 +388,7 @@ class Products extends Component {
                         this.state.minPrice === 0 ? "" : this.state.minPrice
                       }
                       onChange={this.handleOnChange}
+                      aria-label="Min price filter input"
                     />
                   </InputGroup>
                   <InputGroup className="filter-input-group mx-1">
@@ -398,9 +405,12 @@ class Products extends Component {
                           : this.state.maxPrice
                       }
                       onChange={this.handleOnChange}
+                      aria-label="Max price filter input"
                     />
                   </InputGroup>
-                  <Button type="submit">Go</Button>
+                  <Button type="submit" aria-label="Apply price filter">
+                    Go
+                  </Button>
                 </Form>
               }
             />

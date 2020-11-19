@@ -11,7 +11,6 @@ import {
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import Form from "react-bootstrap/Form";
-import FormControl from "react-bootstrap/FormControl";
 import Button from "react-bootstrap/Button";
 import Dropdown from "react-bootstrap/Dropdown";
 import NavDropdown from "react-bootstrap/NavDropdown";
@@ -95,7 +94,7 @@ class Navigation extends Component {
             src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"
             width="75"
             height="75"
-            alt="OSD logo"
+            alt="Office Supply Depot"
           />
         </Link>
         <Navbar.Toggle />
@@ -116,15 +115,20 @@ class Navigation extends Component {
                   {this.getNavDropdowns()}
                 </Dropdown.Menu>
               </Dropdown>
-              <FormControl
+              <Form.Control
                 type="text"
                 placeholder="Search"
                 id="search-box"
                 name="query"
                 value={this.state.query}
                 onChange={this.handleOnChange}
+                aria-label="Search box"
               />
-              <Button id="search-button" type="submit">
+              <Button
+                id="search-button"
+                type="submit"
+                aria-label="Search button"
+              >
                 <FaSearch />
               </Button>
             </Form>

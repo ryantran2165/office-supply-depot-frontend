@@ -15,7 +15,7 @@ class DriverNavigation extends Component {
             src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"
             width="75"
             height="75"
-            alt="OSD logo"
+            alt="Office Supply Depot"
           />
         </Link>
         <Navbar.Toggle />

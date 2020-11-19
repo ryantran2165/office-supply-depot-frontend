@@ -159,7 +159,7 @@ function Product() {
     <Container fluid className="py-5 px-md-5">
       <Row className="justify-content-md-center">
         <Col className="mb-3" xs={8} sm={6} md={5} lg={4} xl={3}>
-          <SquareImage src={product.img_url} />
+          <SquareImage src={product.img_url} alt={product.name} />
         </Col>
         <Col xs={12} md={7}>
           <p className="category-tag">
@@ -197,6 +197,7 @@ function Product() {
                     className="button-round"
                     onClick={() => handleOnChangeQuantity(quantity - 1)}
                     disabled={product.inventory === 0 || cartID !== -1}
+                    aria-label="Decrease quantity"
                   >
                     -
                   </Button>
@@ -208,11 +209,13 @@ function Product() {
                       handleOnChangeQuantity(parseInt(e.target.value))
                     }
                     disabled={product.inventory === 0 || cartID !== -1}
+                    aria-label="Quantity input"
                   />
                   <Button
                     className="button-round"
                     onClick={() => handleOnChangeQuantity(quantity + 1)}
                     disabled={product.inventory === 0 || cartID !== -1}
+                    aria-label="Increase quantity"
                   >
                     +
                   </Button>

@@ -205,16 +205,16 @@ function Cart() {
               <tr>
                 <th></th>
                 <th>
-                  <h5>Product</h5>
+                  <h5 className="mb-0">Product</h5>
                 </th>
                 <th>
-                  <h5>Price</h5>
+                  <h5 className="mb-0">Price</h5>
                 </th>
                 <th>
-                  <h5>Quantity</h5>
+                  <h5 className="mb-0">Quantity</h5>
                 </th>
                 <th>
-                  <h5>Subtotal</h5>
+                  <h5 className="mb-0">Subtotal</h5>
                 </th>
               </tr>
             </thead>
@@ -228,6 +228,7 @@ function Cart() {
                           rounded
                           className="square-image-fixed shadow"
                           src={item.product.img_url}
+                          alt={item.product.name}
                         />
                       </Link>
                     </td>
@@ -240,7 +241,7 @@ function Cart() {
                       </Link>
                     </td>
                     <td className="align-middle">
-                      <h5>${item.product.price}</h5>
+                      <h5 className="mb-0">${item.product.price}</h5>
                     </td>
                     <td className="align-middle text-center">
                       <Row>
@@ -251,6 +252,7 @@ function Cart() {
                               handleOnChangeQuantity(item.quantity - 1, item)
                             }
                             disabled={item.product.inventory === 0}
+                            aria-label="Decrease quantity"
                           >
                             -
                           </Button>
@@ -265,6 +267,7 @@ function Cart() {
                               )
                             }
                             disabled={item.product.inventory === 0}
+                            aria-label="Quantity input"
                           />
                           <Button
                             className="button-round"
@@ -272,6 +275,7 @@ function Cart() {
                               handleOnChangeQuantity(item.quantity + 1, item)
                             }
                             disabled={item.product.inventory === 0}
+                            aria-label="Increase quantity"
                           >
                             +
                           </Button>
@@ -292,7 +296,7 @@ function Cart() {
                       </Row>
                     </td>
                     <td className="align-middle">
-                      <h5>${calculateSubtotal([item])}</h5>
+                      <h5 className="mb-0">${calculateSubtotal([item])}</h5>
                     </td>
                   </tr>
                 );

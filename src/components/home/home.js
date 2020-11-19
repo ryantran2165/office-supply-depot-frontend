@@ -49,7 +49,7 @@ function Home() {
                 <img
                   className="d-block w-100"
                   src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"
-                  alt="First slide"
+                  alt="Furniture"
                 />
                 <Carousel.Caption>
                   <h3>Thanksgiving Sale!</h3>
@@ -65,7 +65,7 @@ function Home() {
                 <img
                   className="d-block w-100"
                   src="https://res.cloudinary.com/osd/image/upload/v1602180156/samples/ecommerce/leather-bag-gray.jpg"
-                  alt="Second slide"
+                  alt="Computer accessories"
                 />
                 <Carousel.Caption>
                   <h3>Cyber Monday Sale!</h3>
@@ -84,7 +84,7 @@ function Home() {
                 <img
                   className="d-block w-100"
                   src="https://res.cloudinary.com/osd/image/upload/v1602180087/samples/ecommerce/analog-classic.jpg"
-                  alt="Third slide"
+                  alt="School supplies"
                 />
                 <Carousel.Caption>
                   <h3>Back to School Sale!</h3>

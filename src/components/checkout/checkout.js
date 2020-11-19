@@ -500,13 +500,14 @@ class Checkout extends Component {
                             rounded
                             className="square-image-fixed shadow"
                             src={item.product.img_url}
+                            alt={item.product.name}
                           />
                           <span className="item-quantity">{item.quantity}</span>
                         </div>
                       </Link>
                     </Col>
                     <Col className="align-self-center">
-                      <h5>${calculateSubtotal([item])}</h5>
+                      <h5 className="mb-0">${calculateSubtotal([item])}</h5>
                     </Col>
                   </Row>
                 );

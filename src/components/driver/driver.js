@@ -72,6 +72,11 @@ function Driver() {
           {deliveries.map((delivery) => (
             <Delivery
               delivery={delivery}
+              onClickSetOrigin={() =>
+                setOrigin(
+                  `${delivery.address_1}, ${delivery.city}, ${delivery.state} ${delivery.zip_code}`
+                )
+              }
               onClickSetDestination={() =>
                 setDestination(
                   `${delivery.address_1}, ${delivery.city}, ${delivery.state} ${delivery.zip_code}`

@@ -6,7 +6,12 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 
-function Delivery({ delivery, onClickSetDestination, onClickSubmitDelivery }) {
+function Delivery({
+  delivery,
+  onClickSetOrigin,
+  onClickSetDestination,
+  onClickSubmitDelivery,
+}) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -40,6 +45,9 @@ function Delivery({ delivery, onClickSetDestination, onClickSubmitDelivery }) {
                 <br />
                 {delivery.phone}
               </p>
+              <Button className="button-orange mr-3" onClick={onClickSetOrigin}>
+                Set origin
+              </Button>
               <Button className="button-orange" onClick={onClickSetDestination}>
                 Set destination
               </Button>
@@ -56,6 +64,7 @@ function Delivery({ delivery, onClickSetDestination, onClickSubmitDelivery }) {
 
 Delivery.propTypes = {
   delivery: PropTypes.object,
+  onClickSetOrigin: PropTypes.func,
   onClickSetDestination: PropTypes.func,
   onClickSubmitDelivery: PropTypes.func,
 };
