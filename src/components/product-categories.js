@@ -62,11 +62,7 @@ const PRODUCT_CATEGORIES = {
   "School Supplies": [
     "Arts and Crafts",
     "School Electronics",
-    "Writing",
     "Backpacks and Lunch Bags",
-    "Folders and Binders",
-    "Basic School Supplies",
-    "Notebooks and Paper",
   ],
   "Ink and Toner": [],
 };
