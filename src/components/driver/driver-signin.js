@@ -44,7 +44,7 @@ class DriverSignIn extends Component {
                 <Link to="/">
                   <Image
                     className="account-logo"
-                    src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"
+                    src="https://res.cloudinary.com/osd/image/upload/v1605931936/Office%20Supply%20Depot/office-supply-depot-logo_fnoqsd.png"
                     alt="OSD logo"
                   />
                 </Link>

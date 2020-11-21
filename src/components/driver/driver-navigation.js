@@ -12,7 +12,7 @@ class DriverNavigation extends Component {
       <Navbar className="shadow-sm pt-3 px-md-5" bg="light" expand="md">
         <Link className="navbar-brand" to="/">
           <img
-            src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"
+            src="https://res.cloudinary.com/osd/image/upload/v1605931936/Office%20Supply%20Depot/office-supply-depot-logo_fnoqsd.png"
             width="75"
             height="75"
             alt="Office Supply Depot"
