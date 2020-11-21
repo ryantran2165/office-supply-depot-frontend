@@ -4,8 +4,8 @@ import Image from "react-bootstrap/Image";
 
 function SquareImage({ src, alt }) {
   return (
-    <div className="square-image">
-      <Image fluid rounded className="shadow" src={src} alt={alt} />
+    <div className="square-image shadow">
+      <Image fluid rounded src={src} alt={alt} />
     </div>
   );
 }
