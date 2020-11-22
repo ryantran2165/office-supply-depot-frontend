@@ -9,6 +9,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
+import Spinner from "react-bootstrap/Spinner";
 import ProductBox from "./product-box";
 import SquareImage from "../square-image";
 
@@ -152,7 +153,17 @@ function Product() {
         </Container>
       );
     }
-    return "";
+    return (
+      <Container className="text-center py-5">
+        <Spinner
+          animation="border"
+          variant="primary"
+          role="loading-product-status"
+        >
+          <span className="sr-only">Loading product...</span>
+        </Spinner>
+      </Container>
+    );
   }
 
   return (

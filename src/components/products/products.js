@@ -11,6 +11,7 @@ import Pagination from "react-bootstrap/Pagination";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import Button from "react-bootstrap/Button";
+import Spinner from "react-bootstrap/Spinner";
 import ProductBox from "./product-box";
 import ProductFilter from "./product-filter";
 import PRODUCT_CATEGORIES from "../product-categories";
@@ -57,6 +58,7 @@ class Products extends Component {
       minPrice: 0,
       maxPrice: Infinity,
       sort: SORT_OPTIONS[0],
+      showSpinner: true,
     };
   }
 
@@ -104,11 +106,13 @@ class Products extends Component {
       queryParams += `&sort=${this.state.sort}`;
     }
 
-    axios
-      .get(`${API_URL}/products/${queryParams}`)
-      .then((res) =>
-        this.setState({ products: res.data.products, count: res.data.count })
-      );
+    axios.get(`${API_URL}/products/${queryParams}`).then((res) =>
+      this.setState({
+        products: res.data.products,
+        count: res.data.count,
+        showSpinner: false,
+      })
+    );
   };
 
   getPagination() {
@@ -416,6 +420,19 @@ class Products extends Component {
             />
           </Col>
           <Col>
+            <Row>
+              <Col className="text-center">
+                {this.state.showSpinner && (
+                  <Spinner
+                    animation="border"
+                    variant="primary"
+                    role="loading-products-status"
+                  >
+                    <span className="sr-only">Loading products...</span>
+                  </Spinner>
+                )}
+              </Col>
+            </Row>
             <Row>
               {this.state.products.map((product) => {
                 return (

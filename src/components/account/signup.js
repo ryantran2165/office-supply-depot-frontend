@@ -9,6 +9,8 @@ import Col from "react-bootstrap/Col";
 import Image from "react-bootstrap/Image";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
+import Alert from "react-bootstrap/Alert";
+import Spinner from "react-bootstrap/Spinner";
 
 class Signup extends Component {
   constructor(props) {
@@ -18,11 +20,14 @@ class Signup extends Component {
       lastName: "",
       email: "",
       password: "",
+      message: "",
+      showSpinner: false,
     };
   }
 
   handleOnSubmit = (e) => {
     e.preventDefault();
+    this.setState({ message: "", showSpinner: true });
 
     const data = {
       first_name: this.state.firstName,
@@ -31,7 +36,22 @@ class Signup extends Component {
       password: this.state.password,
     };
 
-    this.props.signUp(data);
+    const promise = this.props.signUp(data);
+    promise.then((res) => {
+      this.setState({ showSpinner: false });
+
+      if (res === true) {
+        return;
+      } else if (res.response) {
+        this.setState({
+          message: "Account with email already exists",
+        });
+      } else if (res.message) {
+        this.setState({
+          message: "There is a connection issue",
+        });
+      }
+    });
   };
 
   handleOnChange = (e) => {
@@ -45,15 +65,33 @@ class Signup extends Component {
           <Col xs={12} sm={10} md={8} lg={6}>
             <Row>
               <Col className="text-center mb-3">
-                <Image
-                  className="account-logo"
-                  src="https://res.cloudinary.com/osd/image/upload/v1605931936/Office%20Supply%20Depot/office-supply-depot-logo_fnoqsd.png"
-                  alt="OSD logo"
-                />
+                <Link to="/">
+                  <Image
+                    className="account-logo"
+                    src="https://res.cloudinary.com/osd/image/upload/v1605931936/Office%20Supply%20Depot/office-supply-depot-logo_fnoqsd.png"
+                    alt="OSD logo"
+                  />
+                </Link>
               </Col>
             </Row>
             <Form className="account-form" onSubmit={this.handleOnSubmit}>
               <h3 className="text-center mb-3">Create your account</h3>
+              {this.state.showSpinner && (
+                <div className="text-center">
+                  <Spinner
+                    animation="border"
+                    variant="primary"
+                    role="signing-up-status"
+                  >
+                    <span className="sr-only">Signing up...</span>
+                  </Spinner>
+                </div>
+              )}
+              {this.state.message !== "" && (
+                <Alert className="" variant="danger">
+                  {this.state.message}
+                </Alert>
+              )}
               <Form.Group>
                 <Form.Label>First name</Form.Label>
                 <Form.Control

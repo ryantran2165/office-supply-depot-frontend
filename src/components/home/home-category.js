@@ -17,7 +17,7 @@ function HomeCategory({ categoryName, imgSrc }) {
         onClick={() => dispatch(setCategory(categoryName))}
       >
         <SquareImage src={imgSrc} alt={categoryName} />
-        <h5>{categoryName}</h5>
+        <h5 className="mt-3">{categoryName}</h5>
       </Link>
     </Col>
   );

@@ -9,6 +9,8 @@ import Col from "react-bootstrap/Col";
 import Image from "react-bootstrap/Image";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
+import Alert from "react-bootstrap/Alert";
+import Spinner from "react-bootstrap/Spinner";
 
 class DriverSignIn extends Component {
   constructor(props) {
@@ -16,18 +18,34 @@ class DriverSignIn extends Component {
     this.state = {
       email: "",
       password: "",
+      message: "",
+      showSpinner: false,
     };
   }
 
   handleOnSubmit = (e) => {
     e.preventDefault();
+    this.setState({ message: "", showSpinner: true });
 
     const data = {
       email: this.state.email,
       password: this.state.password,
     };
 
-    this.props.driverSignIn(data);
+    const promise = this.props.driverSignIn(data);
+    promise.then((res) => {
+      this.setState({ showSpinner: false });
+
+      if (res === true) {
+        return;
+      } else if (res.data || res.response) {
+        this.setState({ message: "Invalid email/password" });
+      } else if (res.message) {
+        this.setState({
+          message: "There is a connection issue",
+        });
+      }
+    });
   };
 
   handleOnChange = (e) => {
@@ -52,6 +70,22 @@ class DriverSignIn extends Component {
             </Row>
             <Form className="account-form" onSubmit={this.handleOnSubmit}>
               <h3 className="text-center mb-3">Sign in to your account</h3>
+              {this.state.showSpinner && (
+                <div className="text-center">
+                  <Spinner
+                    animation="border"
+                    variant="primary"
+                    role="signing-in-status"
+                  >
+                    <span className="sr-only">Signing in...</span>
+                  </Spinner>
+                </div>
+              )}
+              {this.state.message !== "" && (
+                <Alert className="" variant="danger">
+                  {this.state.message}
+                </Alert>
+              )}
               <Form.Group>
                 <Form.Label>Email address</Form.Label>
                 <Form.Control

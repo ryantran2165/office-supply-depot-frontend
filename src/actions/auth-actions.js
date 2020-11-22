@@ -34,7 +34,7 @@ export const checkSignedIn = () => (dispatch) => {
 };
 
 export const signIn = (data) => (dispatch) => {
-  axios
+  return axios
     .post(`${API_URL}/token-auth/`, data)
     .then((res) => {
       // Sign in success, save token and state
@@ -47,18 +47,15 @@ export const signIn = (data) => (dispatch) => {
         type: SET_USER,
         payload: res.data.user,
       });
+      return true;
     })
     .catch((err) => {
-      // Invalid email/password
-      const error = err.response.data.non_field_errors[0];
-      if (error === "Unable to log in with provided credentials.") {
-        alert("Invalid email/password, please try again.");
-      }
+      return err;
     });
 };
 
 export const signUp = (data) => (dispatch) => {
-  axios
+  return axios
     .post(`${API_URL}/users/user-list/`, data)
     .then((res) => {
       // Sign up success, save token and state
@@ -71,13 +68,10 @@ export const signUp = (data) => (dispatch) => {
         type: SET_USER,
         payload: res.data,
       });
+      return true;
     })
     .catch((err) => {
-      // User with email already exists
-      const error = err.response.data.email[0];
-      if (error === "user with this email address already exists.") {
-        alert("User with this email already exists, please try again.");
-      }
+      return err;
     });
 };
 
@@ -121,7 +115,7 @@ export const checkDriverSignedIn = () => (dispatch) => {
 };
 
 export const driverSignIn = (data) => (dispatch) => {
-  axios
+  return axios
     .post(`${API_URL}/token-auth/`, data)
     .then((res) => {
       if (res.data.user.is_driver) {
@@ -135,17 +129,13 @@ export const driverSignIn = (data) => (dispatch) => {
           type: SET_DRIVER,
           payload: res.data.user,
         });
+        return true;
       } else {
-        // Correct credentials but not driver
-        alert("Invalid email/password, please try again.");
+        return res;
       }
     })
     .catch((err) => {
-      // Invalid email/password
-      const error = err.response.data.non_field_errors[0];
-      if (error === "Unable to log in with provided credentials.") {
-        alert("Invalid email/password, please try again.");
-      }
+      return err;
     });
 };
 
