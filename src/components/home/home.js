@@ -44,16 +44,42 @@ function Home() {
             <Carousel.Item>
               <Link
                 to="/products"
+                onClick={() => dispatch(setCategory("Office Supplies"))}
+              >
+                <img
+                  className="d-block w-100"
+                  src="https://res.cloudinary.com/osd/image/upload/v1606000627/Office%20Supply%20Depot/thanksgiving_l1a2fm.jpg"
+                  alt="Thanksgiving"
+                />
+                <Carousel.Caption>
+                  <div className="carousel-caption-background p-1">
+                    <h3>Thanksgiving Sale!</h3>
+                    <p>
+                      Office supplies, such as pens, folders and binders, as low
+                      as $1.99!
+                    </p>
+                  </div>
+                </Carousel.Caption>
+              </Link>
+            </Carousel.Item>
+            <Carousel.Item>
+              <Link
+                to="/products"
                 onClick={() => dispatch(setCategory("Furniture"))}
               >
                 <img
                   className="d-block w-100"
-                  src="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"
-                  alt="Furniture"
+                  src="https://res.cloudinary.com/osd/image/upload/v1606000700/Office%20Supply%20Depot/black-friday_j4zxew.jpg"
+                  alt="Black Friday"
                 />
                 <Carousel.Caption>
-                  <h3>Thanksgiving Sale!</h3>
-                  <p>Furniture, such as chairs and desks, as low as $9.99!</p>
+                  <div className="carousel-caption-background p-1">
+                    <h3>Black Friday Sale!</h3>
+                    <p>
+                      Furniture, such as chairs, desks and tables, as low as
+                      $29.99!
+                    </p>
+                  </div>
                 </Carousel.Caption>
               </Link>
             </Carousel.Item>
@@ -64,34 +90,17 @@ function Home() {
               >
                 <img
                   className="d-block w-100"
-                  src="https://res.cloudinary.com/osd/image/upload/v1602180156/samples/ecommerce/leather-bag-gray.jpg"
-                  alt="Computer accessories"
+                  src="https://res.cloudinary.com/osd/image/upload/v1606000743/Office%20Supply%20Depot/cyber-monday_sqcjlj.png"
+                  alt="Cyber Monday"
                 />
                 <Carousel.Caption>
-                  <h3>Cyber Monday Sale!</h3>
-                  <p>
-                    Computer accessories, such as mice and monitors, as low as
-                    $4.99!
-                  </p>
-                </Carousel.Caption>
-              </Link>
-            </Carousel.Item>
-            <Carousel.Item>
-              <Link
-                to="/products"
-                onClick={() => dispatch(setCategory("School Supplies"))}
-              >
-                <img
-                  className="d-block w-100"
-                  src="https://res.cloudinary.com/osd/image/upload/v1602180087/samples/ecommerce/analog-classic.jpg"
-                  alt="School supplies"
-                />
-                <Carousel.Caption>
-                  <h3>Back to School Sale!</h3>
-                  <p>
-                    School supplies, such as pencils, pens, and paper, as low as
-                    $0.99!
-                  </p>
+                  <div className="carousel-caption-background p-1">
+                    <h3>Cyber Monday Sale!</h3>
+                    <p>
+                      Computer accessories, such as computers and software, as
+                      low as $19.99!
+                    </p>
+                  </div>
                 </Carousel.Caption>
               </Link>
             </Carousel.Item>
@@ -106,23 +115,23 @@ function Home() {
           <Row className="justify-content-center text-center">
             <HomeCategory
               categoryName="Office Supplies"
-              imgSrc="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"
+              imgSrc="https://res.cloudinary.com/osd/image/upload/v1606000827/Office%20Supply%20Depot/office-supplies_wjsrie.jpg"
             />
             <HomeCategory
               categoryName="Furniture"
-              imgSrc="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"
+              imgSrc="https://res.cloudinary.com/osd/image/upload/v1606001030/Office%20Supply%20Depot/furniture_er381f.jpg"
             />
             <HomeCategory
               categoryName="Cleaning"
-              imgSrc="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"
+              imgSrc="https://res.cloudinary.com/osd/image/upload/v1606000879/Office%20Supply%20Depot/cleaning_lm6cj5.jpg"
             />
             <HomeCategory
               categoryName="Computer Accessories"
-              imgSrc="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"
+              imgSrc="https://res.cloudinary.com/osd/image/upload/v1606001035/Office%20Supply%20Depot/computer-accessories_kzy3wi.jpg"
             />
             <HomeCategory
               categoryName="Electronics"
-              imgSrc="https://res.cloudinary.com/osd/image/upload/v1602180165/samples/ecommerce/accessories-bag.jpg"
+              imgSrc="https://res.cloudinary.com/osd/image/upload/v1606001151/Office%20Supply%20Depot/electronics_fhik8d.jpg"
             />
           </Row>
           <Row className="my-4">
