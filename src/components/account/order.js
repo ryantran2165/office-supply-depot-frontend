@@ -6,7 +6,7 @@ import Card from "react-bootstrap/Card";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import ListGroup from "react-bootstrap/ListGroup";
-import { calculateItemTotal, addMonies } from "../money";
+import { calculateItemSubtotal, addPrices } from "../calculations";
 import { SHIPPING_METHODS } from "../shipping";
 
 function Order({ order }) {
@@ -39,6 +39,11 @@ function Order({ order }) {
     }
     status += ` on ${order.date_delivered.split("T")[0]}`;
   }
+
+  const subtotal = addPrices(
+    order.items.map((item) => calculateItemSubtotal(item.price, item.quantity))
+  );
+  const total = addPrices([subtotal, order.tax, order.shipping_cost]);
 
   return (
     <Accordion className="mt-3">
@@ -83,7 +88,7 @@ function Order({ order }) {
                         <Col>*unavailable product* ({item.quantity})</Col>
                         <Col className="text-right">
                           ${item.price} x {item.quantity} = $
-                          {calculateItemTotal(item.price, item.quantity)}
+                          {calculateItemSubtotal(item.price, item.quantity)}
                         </Col>
                       </Row>
                     </ListGroup.Item>
@@ -102,7 +107,7 @@ function Order({ order }) {
                           </Col>
                           <Col className="text-right">
                             ${item.price} x {item.quantity} = $
-                            {calculateItemTotal(item.price, item.quantity)}
+                            {calculateItemSubtotal(item.price, item.quantity)}
                           </Col>
                         </Row>
                       </ListGroup.Item>
@@ -112,17 +117,18 @@ function Order({ order }) {
               })}
             </ListGroup>
             <Card.Footer>
-              <h6>Subtotal: ${order.subtotal}</h6>
+              <h6>
+                Weight: {order.weight.toFixed(1)} lb
+                {order.weight !== 1 ? "s" : ""}
+              </h6>
+              <h6>Subtotal: ${subtotal}</h6>
               <h6>Tax: ${order.tax}</h6>
               <h6>
                 Shipping: ${order.shipping_cost} (
                 {SHIPPING_METHODS[order.shipping_method].text})
               </h6>
               <hr />
-              <h6>
-                Total: $
-                {addMonies([order.subtotal, order.tax, order.shipping_cost])}
-              </h6>
+              <h6>Total: ${total}</h6>
             </Card.Footer>
           </React.Fragment>
         </Accordion.Collapse>

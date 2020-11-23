@@ -11,7 +11,12 @@ import Col from "react-bootstrap/Col";
 import Image from "react-bootstrap/Image";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import { calculateSubtotal, addMonies } from "../money";
+import {
+  calculateItemSubweight,
+  addWeights,
+  calculateItemSubtotal,
+  addPrices,
+} from "../calculations";
 import {
   SHIPPING_METHODS,
   SUBTOTAL_THRESHOLD,
@@ -95,20 +100,12 @@ class Checkout extends Component {
     this.setState({ shippingMethod: e.target.value });
   };
 
-  calculateWeight() {
-    let weight = 0;
-    for (const item of this.state.cart) {
-      weight += item.quantity * item.product.weight;
-    }
-    return weight;
-  }
-
   calculateTax(subtotal) {
     const tax = parseFloat(subtotal) * TAX_RATE;
     return tax.toFixed(2);
   }
 
-  handleOnSubmit = (e, subtotal, shipping, tax) => {
+  handleOnSubmit = (e, weight, subtotal, shipping, tax) => {
     e.preventDefault();
 
     // Form validation
@@ -171,6 +168,7 @@ class Checkout extends Component {
         zip_code: this.state.zipCode,
         phone: this.state.phone,
         shipping_method: this.state.shippingMethod,
+        weight: parseFloat(weight),
         subtotal: parseFloat(subtotal),
         tax: parseFloat(tax),
         shipping_cost: parseFloat(shipping),
@@ -195,17 +193,25 @@ class Checkout extends Component {
       this.props.history.push("/cart");
     }
 
-    const weight = this.calculateWeight();
-    const subtotal = calculateSubtotal(this.state.cart);
+    const weight = addWeights(
+      this.state.cart.map((item) => calculateItemSubweight(item.product.price, item.quantity))
+    );
+    const subtotal = addPrices(
+      this.state.cart.map((item) =>
+        calculateItemSubtotal(item.product.price, item.quantity)
+      )
+    );
     const shipping = SHIPPING_METHODS[this.state.shippingMethod].price;
     const tax = this.calculateTax(subtotal);
-    const total = addMonies([subtotal, tax, shipping]);
+    const total = addPrices([subtotal, tax, shipping]);
 
     return (
       <Container fluid className="py-5 px-md-5">
         <Form
           className="checkout-address-form"
-          onSubmit={(e) => this.handleOnSubmit(e, subtotal, shipping, tax)}
+          onSubmit={(e) =>
+            this.handleOnSubmit(e, weight, subtotal, shipping, tax)
+          }
           noValidate
           validated={this.state.validated}
         >
@@ -318,9 +324,6 @@ class Checkout extends Component {
               </Form.Group>
               <hr />
               <h5>Shipping method</h5>
-              <p>
-                Weight: {weight.toFixed(1)} lb{weight !== 1 ? "s" : ""}
-              </p>
               <Form.Group>
                 <Form.Check
                   label={`Free ${SHIPPING_METHODS.PICKUP_1.text}`}
@@ -345,11 +348,11 @@ class Checkout extends Component {
                   onChange={this.handleOnChangeShipping}
                 />
                 <Form.Check
-                  label={`Free ${SHIPPING_METHODS.FREE_SAME_DAY_DRONE.text} (weight < ${WEIGHT_THRESHOLD} lbs, subtotal > $${SUBTOTAL_THRESHOLD})`}
+                  label={`Free ${SHIPPING_METHODS.FREE_SAME_DAY_DRONE.text} (weight < ${WEIGHT_THRESHOLD} lbs, subtotal >= $${SUBTOTAL_THRESHOLD})`}
                   type="radio"
                   name="shipping"
                   disabled={
-                    subtotal <= SUBTOTAL_THRESHOLD || weight >= WEIGHT_THRESHOLD
+                    subtotal < SUBTOTAL_THRESHOLD || weight >= WEIGHT_THRESHOLD
                   }
                   value={SHIPPING_METHODS.FREE_SAME_DAY_DRONE.value}
                   checked={
@@ -363,11 +366,11 @@ class Checkout extends Component {
                     SHIPPING_METHODS.COST_SAME_DAY_DRONE.price.split(".")[0]
                   } ${
                     SHIPPING_METHODS.COST_SAME_DAY_DRONE.text
-                  } (weight < ${WEIGHT_THRESHOLD} lbs, subtotal <= $${SUBTOTAL_THRESHOLD})`}
+                  } (weight < ${WEIGHT_THRESHOLD} lbs, subtotal < $${SUBTOTAL_THRESHOLD})`}
                   type="radio"
                   name="shipping"
                   disabled={
-                    subtotal > SUBTOTAL_THRESHOLD || weight >= WEIGHT_THRESHOLD
+                    subtotal >= SUBTOTAL_THRESHOLD || weight >= WEIGHT_THRESHOLD
                   }
                   value={SHIPPING_METHODS.COST_SAME_DAY_DRONE.value}
                   checked={
@@ -377,11 +380,11 @@ class Checkout extends Component {
                   onChange={this.handleOnChangeShipping}
                 />
                 <Form.Check
-                  label={`Free ${SHIPPING_METHODS.FREE_TWO_DAY_TRUCK.text} (weight >= ${WEIGHT_THRESHOLD} lbs, subtotal > $${SUBTOTAL_THRESHOLD})`}
+                  label={`Free ${SHIPPING_METHODS.FREE_TWO_DAY_TRUCK.text} (weight >= ${WEIGHT_THRESHOLD} lbs, subtotal >= $${SUBTOTAL_THRESHOLD})`}
                   type="radio"
                   name="shipping"
                   disabled={
-                    subtotal <= SUBTOTAL_THRESHOLD || weight < WEIGHT_THRESHOLD
+                    subtotal < SUBTOTAL_THRESHOLD || weight < WEIGHT_THRESHOLD
                   }
                   value={SHIPPING_METHODS.FREE_TWO_DAY_TRUCK.value}
                   checked={
@@ -395,11 +398,11 @@ class Checkout extends Component {
                     SHIPPING_METHODS.COST_SAME_DAY_TRUCK.price.split(".")[0]
                   } ${
                     SHIPPING_METHODS.COST_SAME_DAY_TRUCK.text
-                  } (weight >= ${WEIGHT_THRESHOLD} lbs, subtotal > $${SUBTOTAL_THRESHOLD})`}
+                  } (weight >= ${WEIGHT_THRESHOLD} lbs, subtotal >= $${SUBTOTAL_THRESHOLD})`}
                   type="radio"
                   name="shipping"
                   disabled={
-                    subtotal <= SUBTOTAL_THRESHOLD || weight < WEIGHT_THRESHOLD
+                    subtotal < SUBTOTAL_THRESHOLD || weight < WEIGHT_THRESHOLD
                   }
                   value={SHIPPING_METHODS.COST_SAME_DAY_TRUCK.value}
                   checked={
@@ -413,11 +416,11 @@ class Checkout extends Component {
                     SHIPPING_METHODS.COST_TWO_DAY_TRUCK.price.split(".")[0]
                   } ${
                     SHIPPING_METHODS.COST_TWO_DAY_TRUCK.text
-                  } (weight >= ${WEIGHT_THRESHOLD} lbs, subtotal <= $${SUBTOTAL_THRESHOLD})`}
+                  } (weight >= ${WEIGHT_THRESHOLD} lbs, subtotal < $${SUBTOTAL_THRESHOLD})`}
                   type="radio"
                   name="shipping"
                   disabled={
-                    subtotal > SUBTOTAL_THRESHOLD || weight < WEIGHT_THRESHOLD
+                    subtotal >= SUBTOTAL_THRESHOLD || weight < WEIGHT_THRESHOLD
                   }
                   value={SHIPPING_METHODS.COST_TWO_DAY_TRUCK.value}
                   checked={
@@ -474,7 +477,7 @@ class Checkout extends Component {
               </Form.Row>
             </Col>
             <Col
-              className="left-vertical-divider py-3 pl-lg-5"
+              className="left-vertical-divider-lg py-3 pl-lg-5"
               xs={12}
               lg={6}
               xl={5}
@@ -497,12 +500,28 @@ class Checkout extends Component {
                       </Link>
                     </Col>
                     <Col className="align-self-center">
-                      <h5 className="mb-0">${calculateSubtotal([item])}</h5>
+                      <h5 className="mb-0">
+                        $
+                        {calculateItemSubtotal(
+                          item.product.price,
+                          item.quantity
+                        )}
+                      </h5>
                     </Col>
                   </Row>
                 );
               })}
               <hr />
+              <Row className="mb-3">
+                <Col>
+                  <h5>Weight</h5>
+                </Col>
+                <Col>
+                  <h5>
+                    {weight} lb{weight !== "1.0" ? "s" : ""}
+                  </h5>
+                </Col>
+              </Row>
               <Row className="mb-3">
                 <Col>
                   <h5>Subtotal ({this.state.cart.length})</h5>

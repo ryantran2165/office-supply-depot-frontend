@@ -23,17 +23,19 @@ body {
 }
 
 .square-image-fixed {
-  width: 200px;
-  height: 200px;
-  @media only screen and (max-width: 1200px) {
-    width: 100px;
-    height: 100px;
-  }
+  width: 100px;
+  height: 100px;
   object-fit: cover;
 }
 
-.left-vertical-divider {
+.left-vertical-divider-lg {
   @media only screen and (min-width: 992px) {
+    border-left: 2px solid lightgray;
+  }
+}
+
+.left-vertical-divider-xl {
+  @media only screen and (min-width: 1200px) {
     border-left: 2px solid lightgray;
   }
 }

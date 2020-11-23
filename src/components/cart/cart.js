@@ -12,7 +12,11 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Table from "react-bootstrap/Table";
 import Alert from "react-bootstrap/Alert";
-import { calculateSubtotal } from "../money";
+import {
+  calculateItemSubweight,
+  addWeights,
+  calculateItemSubtotal,
+} from "../calculations";
 
 function Cart() {
   const [cart, setCart] = useState(null);
@@ -187,8 +191,17 @@ function Cart() {
     );
   }
 
+  const weight = addWeights(
+    cart.map((item) =>
+      calculateItemSubweight(item.product.price, item.quantity)
+    )
+  );
+  const subtotal = addPrices(
+    cart.map((item) => calculateItemSubtotal(item.product.price, item.quantity))
+  );
+
   return (
-    <Container fluid className="py-5 px-md-5">
+    <Container fluid className="py-5 px-xl-5">
       <Row>
         <Col className="py-3">
           {message !== "" && <Alert variant="success">{message}</Alert>}
@@ -212,13 +225,19 @@ function Cart() {
                   <h5 className="mb-0">Product</h5>
                 </th>
                 <th>
-                  <h5 className="mb-0">Price</h5>
+                  <h5 className="mb-0">Weight (lbs)</h5>
+                </th>
+                <th>
+                  <h5 className="mb-0">Price ($)</h5>
                 </th>
                 <th>
                   <h5 className="mb-0">Quantity</h5>
                 </th>
                 <th>
-                  <h5 className="mb-0">Subtotal</h5>
+                  <h5 className="mb-0">Sub-weight (lbs)</h5>
+                </th>
+                <th>
+                  <h5 className="mb-0">Subtotal ($)</h5>
                 </th>
               </tr>
             </thead>
@@ -245,7 +264,10 @@ function Cart() {
                       </Link>
                     </td>
                     <td className="align-middle">
-                      <h5 className="mb-0">${item.product.price}</h5>
+                      <h5 className="mb-0">{item.product.weight.toFixed(1)}</h5>
+                    </td>
+                    <td className="align-middle">
+                      <h5 className="mb-0">{item.product.price}</h5>
                     </td>
                     <td className="align-middle text-center">
                       <Row>
@@ -314,7 +336,20 @@ function Cart() {
                       </Row>
                     </td>
                     <td className="align-middle">
-                      <h5 className="mb-0">${calculateSubtotal([item])}</h5>
+                      <h5 className="mb-0">
+                        {calculateItemSubweight(
+                          item.product.weight,
+                          item.quantity
+                        )}
+                      </h5>
+                    </td>
+                    <td className="align-middle">
+                      <h5 className="mb-0">
+                        {calculateItemSubtotal(
+                          item.product.price,
+                          item.quantity
+                        )}
+                      </h5>
                     </td>
                   </tr>
                 );
@@ -322,13 +357,23 @@ function Cart() {
             </tbody>
           </Table>
         </Col>
-        <Col className="left-vertical-divider py-3" xs={12} lg={3}>
+        <Col className="left-vertical-divider-xl py-3" xs={12} xl={3}>
+          <Row className="mb-3">
+            <Col>
+              <h5>Weight</h5>
+            </Col>
+            <Col className="text-right">
+              <h5>
+                {weight} lb{weight !== "1.0" ? "s" : ""}
+              </h5>
+            </Col>
+          </Row>
           <Row className="mb-3">
             <Col>
               <h5>Subtotal</h5>
             </Col>
             <Col className="text-right">
-              <h5>${calculateSubtotal(cart)}</h5>
+              <h5>${subtotal}</h5>
             </Col>
           </Row>
           <Row>
