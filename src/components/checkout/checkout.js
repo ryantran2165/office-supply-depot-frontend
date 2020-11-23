@@ -194,7 +194,9 @@ class Checkout extends Component {
     }
 
     const weight = addWeights(
-      this.state.cart.map((item) => calculateItemSubweight(item.product.price, item.quantity))
+      this.state.cart.map((item) =>
+        calculateItemSubweight(item.product.weight, item.quantity)
+      )
     );
     const subtotal = addPrices(
       this.state.cart.map((item) =>

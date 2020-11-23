@@ -194,7 +194,7 @@ function Cart() {
 
   const weight = addWeights(
     cart.map((item) =>
-      calculateItemSubweight(item.product.price, item.quantity)
+      calculateItemSubweight(item.product.weight, item.quantity)
     )
   );
   const subtotal = addPrices(
