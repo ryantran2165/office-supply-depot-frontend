@@ -3,7 +3,7 @@ import { useParams, useHistory } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { signOut } from "../../actions/auth-actions";
 import axios from "axios";
-import { API_URL } from "../../App";
+import { API_URL, getAuthHeader } from "../../App";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -38,15 +38,9 @@ function Product() {
 
         // This is nested because order of setQuantity
         if (signedIn) {
-          const header = {
-            headers: {
-              Authorization: `JWT ${localStorage.getItem("token")}`,
-            },
-          };
-
           // Check if this product is in cart
           axios
-            .get(`${API_URL}/carts/`, header)
+            .get(`${API_URL}/carts/`, getAuthHeader())
             .then((res) => {
               for (const item of res.data) {
                 // id is a String because it comes from url params
@@ -74,10 +68,18 @@ function Product() {
   function handleOnChangeQuantity(quantity) {
     const re = /^\d{1,3}$/;
 
-    if (re.test(quantity)) {
+    if (quantity === "") {
+      setQuantity("");
+    } else if (re.test(quantity)) {
       quantity = Math.max(quantity, 1);
       quantity = Math.min(quantity, product.inventory);
       setQuantity(quantity);
+    }
+  }
+
+  function handleOnBlurQuantity() {
+    if (quantity === "") {
+      setQuantity(1);
     }
   }
 
@@ -94,12 +96,6 @@ function Product() {
       return;
     }
 
-    const header = {
-      headers: {
-        Authorization: `JWT ${localStorage.getItem("token")}`,
-      },
-    };
-
     // Does not have item, add to cart (POST)
     if (cartID === -1) {
       // Check if inventory has changed
@@ -109,7 +105,7 @@ function Product() {
           const data = { product: id, quantity: quantity };
 
           axios
-            .post(`${API_URL}/carts/`, data, header)
+            .post(`${API_URL}/carts/`, data, getAuthHeader())
             .then((res) => {
               setCartID(res.data.id);
               setIsCartButtonDisabled(false);
@@ -131,7 +127,7 @@ function Product() {
     } else {
       // Has product in cart, remove from cart (DELETE)
       axios
-        .delete(`${API_URL}/carts/${cartID}`, header)
+        .delete(`${API_URL}/carts/${cartID}`, getAuthHeader())
         .then(() => {
           setCartID(-1);
           setQuantity(product.inventory === 0 ? 0 : 1);
@@ -217,8 +213,11 @@ function Product() {
                     type="text"
                     value={quantity}
                     onChange={(e) =>
-                      handleOnChangeQuantity(parseInt(e.target.value))
+                      handleOnChangeQuantity(
+                        e.target.value === "" ? "" : parseInt(e.target.value)
+                      )
                     }
+                    onBlur={handleOnBlurQuantity}
                     disabled={product.inventory === 0 || cartID !== -1}
                     aria-label="Quantity input"
                   />

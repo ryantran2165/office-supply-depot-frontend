@@ -5,17 +5,12 @@ import {
   SET_DRIVER,
 } from "./types";
 import axios from "axios";
-import { API_URL } from "../App";
+import { API_URL, getAuthHeader } from "../App";
 
 export const checkSignedIn = () => (dispatch) => {
   // Called on mount (load/refresh)
-  const header = {
-    headers: {
-      Authorization: `JWT ${localStorage.getItem("token")}`,
-    },
-  };
   axios
-    .get(`${API_URL}/users/current-user/`, header)
+    .get(`${API_URL}/users/current-user/`, getAuthHeader())
     .then((res) => {
       // Token not expired, set user
       dispatch({

@@ -82,9 +82,7 @@ class Signin extends Component {
                 </div>
               )}
               {this.state.message !== "" && (
-                <Alert className="" variant="danger">
-                  {this.state.message}
-                </Alert>
+                <Alert variant="danger">{this.state.message}</Alert>
               )}
               <Form.Group>
                 <Form.Label>Email address</Form.Label>

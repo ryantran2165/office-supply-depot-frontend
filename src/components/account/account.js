@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { signOut } from "../../actions/auth-actions";
 import axios from "axios";
-import { API_URL } from "../../App";
+import { API_URL, getAuthHeader } from "../../App";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -13,13 +13,8 @@ function Account() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const header = {
-      headers: {
-        Authorization: `JWT ${localStorage.getItem("token")}`,
-      },
-    };
     axios
-      .get(`${API_URL}/orders/`, header)
+      .get(`${API_URL}/orders/`, getAuthHeader())
       .then((res) => {
         const ordersData = res.data;
         const tempOrders = [];

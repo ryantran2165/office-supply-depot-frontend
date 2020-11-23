@@ -4,7 +4,7 @@ import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { signOut } from "../../actions/auth-actions";
 import axios from "axios";
-import { API_URL } from "../../App";
+import { API_URL, getAuthHeader } from "../../App";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -43,13 +43,8 @@ class Checkout extends Component {
   }
 
   componentDidMount() {
-    const header = {
-      headers: {
-        Authorization: `JWT ${localStorage.getItem("token")}`,
-      },
-    };
     axios
-      .get(`${API_URL}/carts/`, header)
+      .get(`${API_URL}/carts/`, getAuthHeader())
       .then((res) => {
         const cartData = res.data;
 
@@ -128,11 +123,6 @@ class Checkout extends Component {
     }
     this.setState({ submitted: true });
 
-    const header = {
-      headers: {
-        Authorization: `JWT ${localStorage.getItem("token")}`,
-      },
-    };
     const promises = [];
 
     // Check all quantities are <= the available stock
@@ -188,7 +178,7 @@ class Checkout extends Component {
       };
 
       axios
-        .post(`${API_URL}/orders/`, data, header)
+        .post(`${API_URL}/orders/`, data, getAuthHeader())
         .then(() => this.props.history.push("/account"))
         .catch(() => this.tokenExpired());
     });

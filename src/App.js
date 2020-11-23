@@ -117,6 +117,14 @@ class App extends Component {
   }
 }
 
+export function getAuthHeader() {
+  return {
+    headers: {
+      Authorization: `JWT ${localStorage.getItem("token")}`,
+    },
+  };
+}
+
 App.propTypes = {
   signedIn: PropTypes.bool,
   checkSignedIn: PropTypes.func,

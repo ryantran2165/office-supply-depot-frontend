@@ -3,7 +3,7 @@ import { Link, useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { signOut } from "../../actions/auth-actions";
 import axios from "axios";
-import { API_URL } from "../../App";
+import { API_URL, getAuthHeader } from "../../App";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -11,10 +11,13 @@ import Image from "react-bootstrap/Image";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Table from "react-bootstrap/Table";
+import Alert from "react-bootstrap/Alert";
 import { calculateSubtotal } from "../money";
 
 function Cart() {
   const [cart, setCart] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState("");
   const dispatch = useDispatch();
   const history = useHistory();
 
@@ -24,13 +27,8 @@ function Cart() {
   }, []);
 
   function loadCart() {
-    const header = {
-      headers: {
-        Authorization: `JWT ${localStorage.getItem("token")}`,
-      },
-    };
     axios
-      .get(`${API_URL}/carts/`, header)
+      .get(`${API_URL}/carts/`, getAuthHeader())
       .then((res) => {
         const cartData = res.data;
 
@@ -68,54 +66,48 @@ function Cart() {
       .catch(() => tokenExpired(dispatch));
   }
 
-  function handleOnChangeQuantity(quantity, item) {
+  function handleOnChangeQuantity(quantity, i, inventory) {
     const re = /^\d{1,3}$/;
 
-    // Failed regex: 1 to 3 digit number
-    if (!re.test(quantity)) {
-      return;
+    if (quantity === "") {
+      changeQuantity("", i);
+    } else if (re.test(quantity)) {
+      quantity = Math.max(quantity, 1);
+      quantity = Math.min(quantity, inventory);
+      changeQuantity(quantity, i);
+    }
+  }
+
+  function handleOnBlurQuantity(quantity, i) {
+    if (quantity === "") {
+      changeQuantity(1, i);
+    }
+  }
+
+  function changeQuantity(quantity, i) {
+    const cartCopy = [...cart];
+    cartCopy[i].quantity = quantity;
+    setCart(cartCopy);
+  }
+
+  function handleOnClickSave() {
+    const promises = [];
+    setIsSaving(true);
+    setMessage("");
+
+    for (const item of cart) {
+      const data = { quantity: item.quantity };
+      const promise = axios.patch(
+        `${API_URL}/carts/${item.id}/`,
+        data,
+        getAuthHeader()
+      );
+      promises.push(promise);
     }
 
-    // Clamp
-    quantity = Math.max(quantity, 1);
-    quantity = Math.min(quantity, item.product.inventory);
-
-    // Check if inventory has changed
-    axios.get(`${API_URL}/products/${item.product.id}`).then((res) => {
-      // Has enough inventory
-      if (quantity <= res.data.inventory) {
-        const header = {
-          headers: {
-            Authorization: `JWT ${localStorage.getItem("token")}`,
-          },
-        };
-        const data = {
-          quantity: quantity,
-        };
-
-        axios
-          .patch(`${API_URL}/carts/${item.id}/`, data, header)
-          .then(() => {
-            const cartCopy = [...cart];
-
-            // Set new quantity on corresponding item of cart copy
-            for (const itemCopy of cartCopy) {
-              if (itemCopy.id === item.id) {
-                itemCopy.quantity = quantity;
-                break;
-              }
-            }
-
-            setCart(cartCopy);
-          })
-          .catch(() => tokenExpired(dispatch));
-      } else {
-        // Not enough inventory, reload cart
-        loadCart();
-        alert(
-          "The product's inventory has changed.\nPlease choose a new quantity."
-        );
-      }
+    Promise.all(promises).then(() => {
+      setIsSaving(false);
+      setMessage("Cart successfully saved!");
     });
   }
 
@@ -126,14 +118,8 @@ function Cart() {
     }
     e.target.disabled = true;
 
-    const header = {
-      headers: {
-        Authorization: `JWT ${localStorage.getItem("token")}`,
-      },
-    };
-
     axios
-      .delete(`${API_URL}/carts/${itemID}`, header)
+      .delete(`${API_URL}/carts/${itemID}`, getAuthHeader())
       .then(() => {
         // Find the correct index to splice
         for (let i = 0; i < cart.length; i++) {
@@ -159,23 +145,31 @@ function Cart() {
     Promise.all(promises).then((res) => {
       const products = res.map((promise) => promise.data);
 
-      for (const product of products) {
-        for (const item of cart) {
-          if (product.id === item.product.id) {
-            // Not enough inventory
-            if (item.quantity > product.inventory) {
-              loadCart();
-              alert(
-                "Some products' inventories have changed.\nPlease reduce quantities that are greater than the available stock or remove the product."
-              );
-              return;
+      // Get saved cart, not the current temporary cart
+      axios
+        .get(`${API_URL}/carts/`, getAuthHeader())
+        .then((res) => {
+          const cart = res.data;
+
+          for (const product of products) {
+            for (const item of cart) {
+              if (product.id === item.product) {
+                // Not enough inventory
+                if (item.quantity > product.inventory) {
+                  loadCart();
+                  alert(
+                    "Some products' inventories have changed.\nPlease reduce quantities that are greater than the available stock or remove the product."
+                  );
+                  return;
+                }
+              }
             }
           }
-        }
-      }
 
-      // All quantities valid, change page to checkout
-      history.push("/checkout");
+          // All quantities valid, change page to checkout
+          history.push("/checkout");
+        })
+        .catch(() => tokenExpired(dispatch));
     });
   }
 
@@ -197,9 +191,19 @@ function Cart() {
     <Container fluid className="py-5 px-md-5">
       <Row>
         <Col className="py-3">
-          <h3 className="mb-3">
-            Your cart: {cart.length} item{cart.length > 1 ? "s" : ""}
-          </h3>
+          {message !== "" && <Alert variant="success">{message}</Alert>}
+          <Row>
+            <Col>
+              <h3 className="mb-3">
+                Your cart: {cart.length} item{cart.length > 1 ? "s" : ""}
+              </h3>
+            </Col>
+            <Col className="text-right">
+              <Button onClick={handleOnClickSave} disabled={isSaving}>
+                Save cart
+              </Button>
+            </Col>
+          </Row>
           <Table responsive>
             <thead className="text-center">
               <tr>
@@ -219,7 +223,7 @@ function Cart() {
               </tr>
             </thead>
             <tbody className="text-center">
-              {cart.map((item) => {
+              {cart.map((item, i) => {
                 return (
                   <tr key={`cart-${item.id}`}>
                     <td className="text-center">
@@ -245,11 +249,15 @@ function Cart() {
                     </td>
                     <td className="align-middle text-center">
                       <Row>
-                        <Col style={{ minWidth: "200px" }}>
+                        <Col style={{ minWidth: "225px" }}>
                           <Button
                             className="button-round"
                             onClick={() =>
-                              handleOnChangeQuantity(item.quantity - 1, item)
+                              handleOnChangeQuantity(
+                                item.quantity - 1,
+                                i,
+                                item.product.inventory
+                              )
                             }
                             disabled={item.product.inventory === 0}
                             aria-label="Decrease quantity"
@@ -262,9 +270,15 @@ function Cart() {
                             value={item.quantity}
                             onChange={(e) =>
                               handleOnChangeQuantity(
-                                parseInt(e.target.value),
-                                item
+                                e.target.value === ""
+                                  ? ""
+                                  : parseInt(e.target.value),
+                                i,
+                                item.product.inventory
                               )
+                            }
+                            onBlur={() =>
+                              handleOnBlurQuantity(item.quantity, i)
                             }
                             disabled={item.product.inventory === 0}
                             aria-label="Quantity input"
@@ -272,7 +286,11 @@ function Cart() {
                           <Button
                             className="button-round"
                             onClick={() =>
-                              handleOnChangeQuantity(item.quantity + 1, item)
+                              handleOnChangeQuantity(
+                                item.quantity + 1,
+                                i,
+                                item.product.inventory
+                              )
                             }
                             disabled={item.product.inventory === 0}
                             aria-label="Increase quantity"
@@ -316,11 +334,13 @@ function Cart() {
           <Row>
             <Col>
               <Button
-                className="button-oval w-100"
+                className="button-oval w-100 mb-3"
                 onClick={handleOnClickCheckout}
+                disabled={isSaving}
               >
                 Check out
               </Button>
+              <Alert variant="warning">Did you save your cart?</Alert>
             </Col>
           </Row>
         </Col>
