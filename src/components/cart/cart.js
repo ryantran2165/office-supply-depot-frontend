@@ -16,6 +16,7 @@ import {
   calculateItemSubweight,
   addWeights,
   calculateItemSubtotal,
+  addPrices,
 } from "../calculations";
 
 function Cart() {
