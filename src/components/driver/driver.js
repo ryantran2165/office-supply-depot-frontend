@@ -50,6 +50,10 @@ function Driver() {
     });
   }
 
+  function createAddress(delivery) {
+    return `${delivery.address_1}, ${delivery.city}, ${delivery.state} ${delivery.zip_code}`;
+  }
+
   // Make sure deliveries is not null before rendering
   if (deliveries === null) {
     return "";
@@ -64,6 +68,11 @@ function Driver() {
     );
   }
 
+  const waypoints = [];
+  for (const delivery of deliveries) {
+    waypoints.push({ location: createAddress(delivery) });
+  }
+
   return (
     <Container className="py-5 px-md-5">
       <Row>
@@ -72,15 +81,9 @@ function Driver() {
           {deliveries.map((delivery) => (
             <Delivery
               delivery={delivery}
-              onClickSetOrigin={() =>
-                setOrigin(
-                  `${delivery.address_1}, ${delivery.city}, ${delivery.state} ${delivery.zip_code}`
-                )
-              }
+              onClickSetOrigin={() => setOrigin(createAddress(delivery))}
               onClickSetDestination={() =>
-                setDestination(
-                  `${delivery.address_1}, ${delivery.city}, ${delivery.state} ${delivery.zip_code}`
-                )
+                setDestination(createAddress(delivery))
               }
               onClickSubmitDelivery={() =>
                 handleOnClickSubmitDelivery(delivery.id)
@@ -116,6 +119,7 @@ function Driver() {
           <Map
             origin={origin}
             destination={destination}
+            waypoints={waypoints}
             newRequest={newRequest}
             requestHandled={() => setNewRequest(false)}
           />

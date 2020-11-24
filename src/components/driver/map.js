@@ -16,7 +16,7 @@ const center = {
   lng: -121.881074,
 };
 
-function Map({ origin, destination, newRequest, requestHandled }) {
+function Map({ origin, destination, waypoints, newRequest, requestHandled }) {
   const [response, setResponse] = useState(null);
   const [found, setFound] = useState(true);
   const { isLoaded } = useLoadScript({
@@ -49,6 +49,8 @@ function Map({ origin, destination, newRequest, requestHandled }) {
               options={{
                 origin: origin,
                 destination: destination,
+                waypoints: waypoints,
+                optimizeWaypoints: true,
                 travelMode: "DRIVING",
               }}
               callback={directionsCallback}
