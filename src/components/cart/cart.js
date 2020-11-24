@@ -110,10 +110,12 @@ function Cart() {
       promises.push(promise);
     }
 
-    Promise.all(promises).then(() => {
-      setIsSaving(false);
-      setMessage("Cart successfully saved!");
-    });
+    Promise.all(promises)
+      .then(() => {
+        setIsSaving(false);
+        setMessage("Cart successfully saved!");
+      })
+      .catch(() => tokenExpired(dispatch));
   }
 
   function handleOnClickRemove(e, itemID) {

@@ -175,8 +175,37 @@ class Checkout extends Component {
         items: items,
       };
 
-      axios
-        .post(`${API_URL}/orders/`, data, getAuthHeader())
+      const promises2 = [];
+
+      // Post new order
+      const postOrderPromise = axios.post(
+        `${API_URL}/orders/`,
+        data,
+        getAuthHeader()
+      );
+      promises2.push(postOrderPromise);
+
+      for (const item of this.state.cart) {
+        // Patch product inventories
+        const productData = {
+          inventory: item.product.inventory - item.quantity,
+        };
+        const patchProductPromise = axios.patch(
+          `${API_URL}/products/${item.product.id}/`,
+          productData,
+          getAuthHeader()
+        );
+        promises2.push(patchProductPromise);
+
+        // Clear cart
+        const deleteCartPromise = axios.delete(
+          `${API_URL}/carts/${item.id}/`,
+          getAuthHeader()
+        );
+        promises2.push(deleteCartPromise);
+      }
+
+      Promise.all(promises2)
         .then(() => this.props.history.push("/account"))
         .catch(() => this.tokenExpired());
     });
