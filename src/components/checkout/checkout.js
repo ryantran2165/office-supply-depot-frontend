@@ -105,6 +105,30 @@ class Checkout extends Component {
     return tax.toFixed(2);
   }
 
+  validateExpirationDate(e) {
+    const date = e.target.value.split("/");
+    const month = parseInt(date[0]);
+    const year = parseInt(date[1]);
+
+    // Invalid month
+    if (month < 1 || month > 12) {
+      e.target.setCustomValidity("Invalid month!");
+      return;
+    }
+
+    const curDate = new Date().toLocaleDateString().split("/");
+    const curMonth = parseInt(curDate[0]);
+    const curYear = parseInt(curDate[2].substring(2, 4));
+
+    // Expired
+    if (year < curYear || (year === curYear && month < curMonth)) {
+      e.target.setCustomValidity("Expired!");
+      return;
+    }
+
+    e.target.setCustomValidity("");
+  }
+
   handleOnSubmit = (e, weight, subtotal, shipping, tax) => {
     e.preventDefault();
 
@@ -259,6 +283,7 @@ class Checkout extends Component {
                     name="firstName"
                     value={this.state.firstName}
                     onChange={this.handleOnChange}
+                    pattern="^[a-zA-Z][a-zA-Z ,.'-]*$"
                     maxLength="128"
                   />
                 </Form.Group>
@@ -271,6 +296,7 @@ class Checkout extends Component {
                     name="lastName"
                     value={this.state.lastName}
                     onChange={this.handleOnChange}
+                    pattern="^[a-zA-Z][a-zA-Z ,.'-]*$"
                     maxLength="128"
                   />
                 </Form.Group>
@@ -322,7 +348,7 @@ class Checkout extends Component {
                     name="state"
                     value={this.state.state}
                     onChange={this.handleOnChange}
-                    pattern="[A-Z]{2}"
+                    pattern="^(?:A[KLRZ]|C[AOT]|D[CE]|FL|GA|HI|I[ADLN]|K[SY]|LA|M[ADEINOST]|N[CDEHJMVY]|O[HKR]|PA|RI|S[CD]|T[NX]|UT|V[AT]|W[AIVY])*$"
                     maxLength="2"
                   />
                 </Form.Group>
@@ -335,7 +361,7 @@ class Checkout extends Component {
                     name="zipCode"
                     value={this.state.zipCode}
                     onChange={this.handleOnChange}
-                    pattern="\d{5}"
+                    pattern="^\d{5}$"
                     maxLength="5"
                   />
                 </Form.Group>
@@ -349,7 +375,7 @@ class Checkout extends Component {
                   name="phone"
                   value={this.state.phone}
                   onChange={this.handleOnChange}
-                  pattern="\d{10}"
+                  pattern="^\d{10}$"
                   maxLength="10"
                 />
               </Form.Group>
@@ -470,7 +496,7 @@ class Checkout extends Component {
                     required
                     type="text"
                     placeholder="0123456789012345"
-                    pattern="\d{16}"
+                    pattern="^\d{16}$"
                     maxLength="16"
                   />
                 </Form.Group>
@@ -480,6 +506,7 @@ class Checkout extends Component {
                     required
                     type="text"
                     placeholder="John Doe"
+                    pattern="^[a-zA-Z]+(?: [a-zA-Z]+)*$"
                     maxLength="128"
                   />
                 </Form.Group>
@@ -490,8 +517,9 @@ class Checkout extends Component {
                   <Form.Control
                     required
                     type="text"
-                    placeholder="01/20"
-                    pattern="\d{2}/\d{2}"
+                    placeholder="01/22"
+                    onChange={this.validateExpirationDate}
+                    pattern="^\d{2}/\d{2}$"
                     maxLength="5"
                   />
                 </Form.Group>
@@ -501,7 +529,7 @@ class Checkout extends Component {
                     required
                     type="text"
                     placeholder="012"
-                    pattern="\d{3,4}"
+                    pattern="^\d{3,4}$"
                     maxLength="4"
                   />
                 </Form.Group>

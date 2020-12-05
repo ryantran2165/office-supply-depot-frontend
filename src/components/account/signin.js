@@ -88,7 +88,7 @@ class Signin extends Component {
                 <Form.Label>Email address</Form.Label>
                 <Form.Control
                   required
-                  type="email"
+                  type="text"
                   placeholder="john.doe@gmail.com"
                   name="email"
                   value={this.state.email}

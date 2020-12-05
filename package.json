@@ -20,6 +20,7 @@
     "react-scripts": "3.4.3",
     "redux": "^4.0.5",
     "redux-logger": "^3.0.6",
+    "redux-state-sync": "^3.1.2",
     "redux-thunk": "^2.3.0"
   },
   "scripts": {

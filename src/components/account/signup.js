@@ -22,11 +22,19 @@ class Signup extends Component {
       password: "",
       message: "",
       showSpinner: false,
+      validated: false,
     };
   }
 
   handleOnSubmit = (e) => {
     e.preventDefault();
+
+    // Form validation
+    if (e.currentTarget.checkValidity() === false) {
+      this.setState({ validated: true });
+      return;
+    }
+
     this.setState({ message: "", showSpinner: true });
 
     const data = {
@@ -74,7 +82,12 @@ class Signup extends Component {
                 </Link>
               </Col>
             </Row>
-            <Form className="account-form" onSubmit={this.handleOnSubmit}>
+            <Form
+              className="account-form"
+              onSubmit={this.handleOnSubmit}
+              noValidate
+              validated={this.state.validated}
+            >
               <h3 className="text-center mb-3">Create your account</h3>
               {this.state.showSpinner && (
                 <div className="text-center">
@@ -99,6 +112,7 @@ class Signup extends Component {
                   name="firstName"
                   value={this.state.firstName}
                   onChange={this.handleOnChange}
+                  pattern="^[a-zA-Z][a-zA-Z ,.'-]*$"
                   maxLength="128"
                 />
               </Form.Group>
@@ -111,6 +125,7 @@ class Signup extends Component {
                   name="lastName"
                   value={this.state.lastName}
                   onChange={this.handleOnChange}
+                  pattern="^[a-zA-Z][a-zA-Z ,.'-]*$"
                   maxLength="128"
                 />
               </Form.Group>
@@ -118,11 +133,12 @@ class Signup extends Component {
                 <Form.Label>Email address</Form.Label>
                 <Form.Control
                   required
-                  type="email"
+                  type="text"
                   placeholder="john.doe@gmail.com"
                   name="email"
                   value={this.state.email}
                   onChange={this.handleOnChange}
+                  pattern="^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+(?:\.[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+)*@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$"
                   maxLength="254"
                 />
               </Form.Group>
@@ -135,8 +151,12 @@ class Signup extends Component {
                   name="password"
                   value={this.state.password}
                   onChange={this.handleOnChange}
+                  pattern="^[ -~]{6,}$"
                   maxLength="128"
                 />
+                <Form.Text muted>
+                  - Must be at least 6 characters long
+                </Form.Text>
               </Form.Group>
               <Button className="button-oval w-100" type="submit">
                 Sign Up
