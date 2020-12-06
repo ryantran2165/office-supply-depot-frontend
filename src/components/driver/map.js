@@ -6,6 +6,7 @@ import {
   DirectionsService,
   DirectionsRenderer,
 } from "@react-google-maps/api";
+import { GOOGLE_MAPS_API_KEY } from "../../App";
 
 const containerStyle = {
   width: "100%",
@@ -20,7 +21,7 @@ function Map({ origin, destination, waypoints, newRequest, requestHandled }) {
   const [response, setResponse] = useState(null);
   const [found, setFound] = useState(true);
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: "AIzaSyCvNOUWjkIi8V_jKReYrhrNSSHDnVKn2K8",
+    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
   });
 
   function directionsCallback(response) {

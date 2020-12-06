@@ -11,6 +11,8 @@ import Col from "react-bootstrap/Col";
 import Image from "react-bootstrap/Image";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
+import Alert from "react-bootstrap/Alert";
+import { Loader } from "@googlemaps/js-api-loader";
 import {
   calculateItemSubweight,
   addWeights,
@@ -22,6 +24,7 @@ import {
   SUBTOTAL_THRESHOLD,
   WEIGHT_THRESHOLD,
 } from "../shipping";
+import { GOOGLE_MAPS_API_KEY } from "../../App";
 
 const TAX_RATE = 0.0725;
 
@@ -44,7 +47,22 @@ class Checkout extends Component {
       shippingCost: 0,
       submitted: false,
       validated: false,
+      error: "",
+      warning: "",
+      address1Alt: "",
+      cityAlt: "",
+      stateAlt: "",
+      zipCodeAlt: "",
     };
+
+    // Geocoder
+    const loader = new Loader({
+      apiKey: GOOGLE_MAPS_API_KEY,
+    });
+
+    loader.load().then(() => {
+      this.geocoder = new window.google.maps.Geocoder();
+    });
   }
 
   componentDidMount() {
@@ -131,6 +149,7 @@ class Checkout extends Component {
 
   handleOnSubmit = (e, weight, subtotal, shipping, tax) => {
     e.preventDefault();
+    this.setState({ error: "", warning: "" });
 
     // Form validation
     if (e.currentTarget.checkValidity() === false) {
@@ -142,96 +161,151 @@ class Checkout extends Component {
     if (this.state.submitted) {
       return;
     }
-    this.setState({ submitted: true });
 
-    const promises = [];
+    // Address validation
+    const address = `${this.state.address1}, ${this.state.city}, ${this.state.state} ${this.state.zipCode}`;
 
-    // Check all quantities are <= the available stock
-    for (const item of this.state.cart) {
-      const promise = axios.get(`${API_URL}/products/${item.product.id}`);
-      promises.push(promise);
-    }
+    this.geocoder.geocode({ address: address }, (results, status) => {
+      if (status === "ZERO_RESULTS") {
+        this.setState({ error: "Invalid address" });
+        return;
+      } else if (status !== "OK") {
+        this.setState({ error: "Geocoder ran into an error" });
+        return;
+      }
 
-    Promise.all(promises).then((res) => {
-      const products = res.map((promise) => promise.data);
+      // Check if formatted address matches user input exactly
+      try {
+        const formattedAddress = results[0].formatted_address;
+        const split1 = formattedAddress.split(",");
+        const address1 = split1[0];
+        const city = split1[1];
+        const split2 = split1[2].split(" ");
+        const state = split2[1];
+        const zipCode = split2[2];
 
-      for (const product of products) {
-        for (const item of this.state.cart) {
-          if (product.id === item.product.id) {
-            // Not enough inventory
-            if (item.quantity > product.inventory) {
-              this.props.history.push("/cart");
-              alert(
-                "Some products' inventories have changed.\nPlease reduce quantities that are greater than the available stock or remove the product."
-              );
-              return;
+        // Weird addresses
+        if (
+          address1 === undefined ||
+          city === undefined ||
+          state === undefined ||
+          zipCode === undefined
+        ) {
+          this.setState({ error: "Invalid address" });
+          return;
+        }
+
+        // Not match
+        if (
+          address1 !== this.state.address1 ||
+          city !== this.state.city ||
+          state !== this.state.state ||
+          zipCode !== this.state.zipCode
+        ) {
+          this.setState({
+            warning: `Did you mean: ${address1}, ${city}, ${state} ${zipCode}`,
+            address1Alt: address1,
+            cityAlt: city,
+            stateAlt: state,
+            zipCodeAlt: zipCode,
+          });
+          return;
+        }
+      } catch (err) {
+        this.setState({ error: "Invalid address" });
+        return;
+      }
+
+      this.setState({ submitted: true });
+      const promises = [];
+
+      // Check all quantities are <= the available stock
+      for (const item of this.state.cart) {
+        const promise = axios.get(`${API_URL}/products/${item.product.id}`);
+        promises.push(promise);
+      }
+
+      Promise.all(promises).then((res) => {
+        const products = res.map((promise) => promise.data);
+
+        for (const product of products) {
+          for (const item of this.state.cart) {
+            if (product.id === item.product.id) {
+              // Not enough inventory
+              if (item.quantity > product.inventory) {
+                this.props.history.push("/cart");
+                alert(
+                  "Some products' inventories have changed.\nPlease reduce quantities that are greater than the available stock or remove the product."
+                );
+                return;
+              }
             }
           }
         }
-      }
 
-      // All quantities valid, get cart items to send as data
-      const items = [];
-      for (const item of this.state.cart) {
-        const itemData = {
-          product: item.product.id,
-          quantity: item.quantity,
-          price: item.product.price,
+        // All quantities valid, get cart items to send as data
+        const items = [];
+        for (const item of this.state.cart) {
+          const itemData = {
+            product: item.product.id,
+            quantity: item.quantity,
+            price: item.product.price,
+          };
+          items.push(itemData);
+        }
+
+        // All quantities valid, attempt to place order
+        const data = {
+          first_name: this.state.firstName,
+          last_name: this.state.lastName,
+          address_1: this.state.address1,
+          address_2: this.state.address2,
+          city: this.state.city,
+          state: this.state.state,
+          zip_code: this.state.zipCode,
+          phone: this.state.phone,
+          shipping_method: this.state.shippingMethod,
+          weight: parseFloat(weight),
+          subtotal: parseFloat(subtotal),
+          tax: parseFloat(tax),
+          shipping_cost: parseFloat(shipping),
+          items: items,
         };
-        items.push(itemData);
-      }
 
-      // All quantities valid, attempt to place order
-      const data = {
-        first_name: this.state.firstName,
-        last_name: this.state.lastName,
-        address_1: this.state.address1,
-        address_2: this.state.address2,
-        city: this.state.city,
-        state: this.state.state,
-        zip_code: this.state.zipCode,
-        phone: this.state.phone,
-        shipping_method: this.state.shippingMethod,
-        weight: parseFloat(weight),
-        subtotal: parseFloat(subtotal),
-        tax: parseFloat(tax),
-        shipping_cost: parseFloat(shipping),
-        items: items,
-      };
+        const promises2 = [];
 
-      const promises2 = [];
-
-      // Post new order
-      const postOrderPromise = axios.post(
-        `${API_URL}/orders/`,
-        data,
-        getAuthHeader()
-      );
-      promises2.push(postOrderPromise);
-
-      for (const item of this.state.cart) {
-        // Patch product inventories
-        const productData = {
-          inventory: item.product.inventory - item.quantity,
-        };
-        const patchProductPromise = axios.patch(
-          `${API_URL}/products/${item.product.id}/`,
-          productData,
+        // Post new order
+        const postOrderPromise = axios.post(
+          `${API_URL}/orders/`,
+          data,
           getAuthHeader()
         );
-        promises2.push(patchProductPromise);
+        promises2.push(postOrderPromise);
 
-        // Clear cart
-        const deleteCartPromise = axios.delete(
-          `${API_URL}/carts/${item.id}/`,
-          getAuthHeader()
-        );
-        promises2.push(deleteCartPromise);
-      }
+        for (const item of this.state.cart) {
+          // Patch product inventories
+          const productData = {
+            inventory: item.product.inventory - item.quantity,
+          };
+          const patchProductPromise = axios.patch(
+            `${API_URL}/products/${item.product.id}/`,
+            productData,
+            getAuthHeader()
+          );
+          promises2.push(patchProductPromise);
 
-      Promise.all(promises2)
-        .then(() => this.props.history.push("/account"))
-        .catch(() => this.tokenExpired());
+          // Clear cart
+          const deleteCartPromise = axios.delete(
+            `${API_URL}/carts/${item.id}/`,
+            getAuthHeader()
+          );
+          promises2.push(deleteCartPromise);
+        }
+
+        Promise.all(promises2)
+          .then(() => this.props.history.push("/account"))
+          .catch(() => this.tokenExpired());
+      });
     });
   };
 
@@ -272,6 +346,34 @@ class Checkout extends Component {
         >
           <Row className="justify-content-center">
             <Col className="py-3 pr-lg-5" xs={12} lg={6} xl={5}>
+              {this.state.error !== "" && (
+                <Alert variant="danger">{this.state.error}</Alert>
+              )}
+              {this.state.warning !== "" && (
+                <React.Fragment>
+                  <Alert variant="warning">{this.state.warning}</Alert>
+                  <Button
+                    className="mb-3 mr-3"
+                    onClick={() =>
+                      this.setState({
+                        warning: "",
+                        address1: this.state.address1Alt,
+                        city: this.state.cityAlt,
+                        state: this.state.stateAlt,
+                        zipCode: this.state.zipCodeAlt,
+                      })
+                    }
+                  >
+                    Yes
+                  </Button>
+                  <Button
+                    className="mb-3"
+                    onClick={() => this.setState({ warning: "" })}
+                  >
+                    No
+                  </Button>
+                </React.Fragment>
+              )}
               <h5>Shipping address</h5>
               <Form.Row>
                 <Form.Group as={Col}>

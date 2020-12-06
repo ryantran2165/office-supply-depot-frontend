@@ -6,8 +6,9 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Carousel from "react-bootstrap/Carousel";
-import HomeCategory from "./home-category";
 import { useLoadScript, GoogleMap, Marker } from "@react-google-maps/api";
+import HomeCategory from "./home-category";
+import { GOOGLE_MAPS_API_KEY } from "../../App";
 
 const containerStyle = {
   width: "100%",
@@ -28,7 +29,7 @@ function Home() {
   const [index, setIndex] = useState(0);
   const dispatch = useDispatch();
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: "AIzaSyCvNOUWjkIi8V_jKReYrhrNSSHDnVKn2K8",
+    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
   });
 
   return (

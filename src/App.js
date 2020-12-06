@@ -21,6 +21,7 @@ export const IS_LOCAL = false;
 export const API_URL = IS_LOCAL
   ? "http://localhost:8000"
   : "https://office-supply-depot-backend.herokuapp.com";
+export const GOOGLE_MAPS_API_KEY = "AIzaSyCvNOUWjkIi8V_jKReYrhrNSSHDnVKn2K8";
 
 class App extends Component {
   componentDidMount() {
