@@ -148,17 +148,17 @@ class Checkout extends Component {
   }
 
   handleOnSubmit = (e, weight, subtotal, shipping, tax) => {
+    // Prevent multiple submits
+    if (this.state.submitted) {
+      return;
+    }
+
     e.preventDefault();
     this.setState({ error: "", warning: "" });
 
     // Form validation
     if (e.currentTarget.checkValidity() === false) {
       this.setState({ validated: true });
-      return;
-    }
-
-    // Prevent multiple submits
-    if (this.state.submitted) {
       return;
     }
 
@@ -179,7 +179,7 @@ class Checkout extends Component {
         const formattedAddress = results[0].formatted_address;
         const split1 = formattedAddress.split(",");
         const address1 = split1[0];
-        const city = split1[1];
+        const city = split1[1].substring(1, split1[1].length);
         const split2 = split1[2].split(" ");
         const state = split2[1];
         const zipCode = split2[2];
