@@ -718,7 +718,11 @@ class Checkout extends Component {
               </Row>
               <Row>
                 <Col>
-                  <Button className="button-oval w-100" type="submit">
+                  <Button
+                    className="button-oval w-100"
+                    type="submit"
+                    disabled={this.state.submitted}
+                  >
                     Place order
                   </Button>
                 </Col>
