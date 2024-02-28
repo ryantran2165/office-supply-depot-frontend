@@ -1,4 +1,4 @@
-# Office Supply Depot Frontend
+# Office Supply Depot Frontend (DEFUNCT)
 
 Backend: https://github.com/ryantran2165/office-supply-depot-backend
 
